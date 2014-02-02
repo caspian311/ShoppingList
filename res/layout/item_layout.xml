@@ -6,6 +6,17 @@
     
     <TextView 
         	android:id="@+id/new_item"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
         	/>
-
+<!-- 
+    <ImageButton 
+        	android:id="@+id/remove_item"
+        	android:layout_width="40dp"
+        	android:layout_height="40dp"
+        	android:contentDescription="@string/remove_item_text"
+        	android:background="@drawable/remove"
+        	/>
+ -->
+    
 </LinearLayout>
