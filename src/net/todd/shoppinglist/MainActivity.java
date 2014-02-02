@@ -13,7 +13,22 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
-    @Override
+    private static class CheckboxStateMaintainer implements OnClickListener {
+    	private boolean isChecked;
+
+		@Override
+		public void onClick(View v) {
+			if (isChecked) {
+				isChecked = false;
+				v.setBackgroundResource(R.drawable.uncheck);
+			} else {
+				isChecked = true;
+				v.setBackgroundResource(R.drawable.check);
+			}
+		}
+	}
+
+	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
@@ -31,20 +46,25 @@ public class MainActivity extends Activity {
     }
     
     private void createNewItem(String newItemValue) {
-    	ViewGroup newListItemLayout = createNewItem();
+    	ViewGroup newListItemViewGroup = createNewItem();
     	
-    	populateName(newItemValue, newListItemLayout);
-    	setupDeleteEvent(newListItemLayout);
+    	populateName(newItemValue, newListItemViewGroup);
+    	setupDeleteEvent(newListItemViewGroup);
+    	setupCheckEvent(newListItemViewGroup);
 
-    	attachNewItem(newListItemLayout);
+    	attachNewItem(newListItemViewGroup);
     }
 
-	private void setupDeleteEvent(final ViewGroup newListItemLayout) {
-		newListItemLayout.findViewById(R.id.remove_item).setOnClickListener(new OnClickListener() {
+	private void setupCheckEvent(final ViewGroup newListItemViewGroup) {
+		newListItemViewGroup.findViewById(R.id.check_item).setOnClickListener(new CheckboxStateMaintainer());
+	}
+
+	private void setupDeleteEvent(final ViewGroup newListItemViewGroup) {
+		newListItemViewGroup.findViewById(R.id.remove_item).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				ViewGroup parent = (ViewGroup)newListItemLayout.getParent();
-				parent.removeView(newListItemLayout);
+				ViewGroup parent = (ViewGroup)newListItemViewGroup.getParent();
+				parent.removeView(newListItemViewGroup);
 			}
 		});
 	}
