@@ -34,9 +34,20 @@ public class MainActivity extends Activity {
     	ViewGroup newListItemLayout = createNewItem();
     	
     	populateName(newItemValue, newListItemLayout);
+    	setupDeleteEvent(newListItemLayout);
 
     	attachNewItem(newListItemLayout);
     }
+
+	private void setupDeleteEvent(final ViewGroup newListItemLayout) {
+		newListItemLayout.findViewById(R.id.remove_item).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				ViewGroup parent = (ViewGroup)newListItemLayout.getParent();
+				parent.removeView(newListItemLayout);
+			}
+		});
+	}
 
 	private void attachNewItem(ViewGroup newListItemLayout) {
 		LinearLayout listContents = (LinearLayout)findViewById(R.id.listContents);
