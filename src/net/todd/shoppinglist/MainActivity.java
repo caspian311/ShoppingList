@@ -31,14 +31,26 @@ public class MainActivity extends Activity {
     }
     
     private void createNewItem(String newItemValue) {
-    	LinearLayout listContents = (LinearLayout)findViewById(R.id.listContents);
+    	ViewGroup newListItemLayout = createNewItem();
     	
-    	LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    	ViewGroup newListItemLayout = (ViewGroup)inflater.inflate(R.layout.item_layout, null, false);
-    	
-    	TextView newItemTextView = (TextView)newListItemLayout.findViewById(R.id.new_item);
-    	newItemTextView.setText(newItemValue);
-    	
-    	listContents.addView(newListItemLayout, 0);
+    	populateName(newItemValue, newListItemLayout);
+
+    	attachNewItem(newListItemLayout);
     }
+
+	private void attachNewItem(ViewGroup newListItemLayout) {
+		LinearLayout listContents = (LinearLayout)findViewById(R.id.listContents);
+    	listContents.addView(newListItemLayout, 0);
+	}
+
+	private void populateName(String newItemValue, ViewGroup newListItemLayout) {
+		TextView newItemTextView = (TextView)newListItemLayout.findViewById(R.id.new_item);
+    	newItemTextView.setText(newItemValue);
+	}
+
+	private ViewGroup createNewItem() {
+		LayoutInflater inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    	ViewGroup newListItemLayout = (ViewGroup)inflater.inflate(R.layout.item_layout, null, false);
+		return newListItemLayout;
+	}
 }
