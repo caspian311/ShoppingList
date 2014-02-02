@@ -29,7 +29,8 @@ public final class R {
         public static final int addItemButton=0x7f070000;
         public static final int listContents=0x7f070003;
         public static final int newItemText=0x7f070001;
-        public static final int new_item=0x7f070004;
+        public static final int new_item=0x7f070005;
+        public static final int remove_item=0x7f070004;
         public static final int scrollView1=0x7f070002;
     }
     public static final class layout {
