@@ -7,6 +7,8 @@
     <uses-sdk
         android:minSdkVersion="18"
         android:targetSdkVersion="18" />
+    
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:allowBackup="true"
@@ -22,6 +24,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <service android:name="net.todd.shoppinglist.DataService"
+            android:permission="android.permission.INTERNET"></service>
     </application>
 
 </manifest>

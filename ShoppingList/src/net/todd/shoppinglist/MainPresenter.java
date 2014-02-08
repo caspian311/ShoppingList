@@ -8,50 +8,43 @@ public class MainPresenter {
 		mainView.addItemButtonListener(new IListener() {
 			@Override
 			public void handle() {
-				String newItemText = mainView.getNewItemText();
+				mainModel.createItem(mainView.getNewItemText());
 				mainView.clearNewItemText();
-
-				mainModel.createItem(newItemText);
 			}
 		});
 
 		mainModel.addItemCreatedListener(new IListener() {
 			@Override
 			public void handle() {
-				ShoppingItem newItemValue = mainModel.getNewItem();
-				mainView.createNewItem(newItemValue);
+				mainView.createNewItem(mainModel.getNewItem());
 			}
 		});
 
 		mainView.addDeleteListener(new IListener() {
 			@Override
 			public void handle() {
-				ShoppingItem itemToRemove = mainView.getItemToDelete();
-				mainModel.removeShoppingItem(itemToRemove);
+				mainModel.removeShoppingItem(mainView.getItemToDelete());
 			}
 		});
 
 		mainModel.addItemRemovedListener(new IListener() {
 			@Override
 			public void handle() {
-				ShoppingItem itemToRemove = mainModel.getItemToRemove();
-				mainView.removeShoppingItem(itemToRemove);
+				mainView.removeShoppingItem(mainModel.getItemToRemove());
 			}
 		});
 
 		mainView.addCheckItemListener(new IListener() {
 			@Override
 			public void handle() {
-				ShoppingItem itemToCheck = mainView.getItemToCheck();
-				mainModel.checkItem(itemToCheck);
+				mainModel.checkItem(mainView.getItemToCheck());
 			}
 		});
 
 		mainModel.addItemCheckedListener(new IListener() {
 			@Override
 			public void handle() {
-				ShoppingItem shoppingItem = mainModel.getCheckedItem();
-				mainView.checkItem(shoppingItem);
+				mainView.checkItem(mainModel.getCheckedItem());
 			}
 		});
 	}
