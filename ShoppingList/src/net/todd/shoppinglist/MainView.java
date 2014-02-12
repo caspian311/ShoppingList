@@ -59,19 +59,27 @@ public class MainView implements IMainView {
 		newItemText.setText("");
     }
     
-    public void createNewItem(final String newShoppingItemId, final String newShoppingItemValue) {
+    public void createNewItem(String id, String value) {
+    	createWidget(id, value);
+    	attachEventing(id);
+    }
+    
+    private void createWidget(String id, String value) {
     	LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     	final ViewGroup newListItemViewGroup = (ViewGroup)inflater.inflate(R.layout.item_layout, null, false);
     	
     	TextView newItemTextView = (TextView)newListItemViewGroup.findViewById(R.id.new_item);
-    	newItemTextView.setText(newShoppingItemValue);
+    	newItemTextView.setText(value);
     	
     	LinearLayout listContents = (LinearLayout)context.findViewById(R.id.listContents);
     	listContents.addView(newListItemViewGroup, 0);
     	
-    	shoppingItemViewGroupMap.put(newShoppingItemId, newListItemViewGroup);
-    	
-    	newListItemViewGroup.findViewById(R.id.remove_item).setOnClickListener(new OnClickListener() {
+    	shoppingItemViewGroupMap.put(id, newListItemViewGroup);
+    }
+
+	private void attachEventing(final String newShoppingItemId) {
+		ViewGroup newListItemViewGroup = shoppingItemViewGroupMap.get(newShoppingItemId);
+		newListItemViewGroup.findViewById(R.id.remove_item).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				deleteListener.itemModified(newShoppingItemId);
@@ -83,7 +91,7 @@ public class MainView implements IMainView {
 				checkItemListener.itemModified(newShoppingItemId);
 			}
 		});
-    }
+	}
     
 	public void checkItem(String shoppingItemId) {
     	ViewGroup itemViewGroup = shoppingItemViewGroupMap.get(shoppingItemId);
