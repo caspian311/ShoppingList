@@ -1,10 +1,11 @@
 package net.todd.shoppinglist.service;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.todd.shoppinglist.ShoppingItem;
-
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
@@ -14,11 +15,8 @@ public class DataService extends Service {
 	private final IBinder binder = new DataServiceBinder();
 
 	private DataChangedListener dataChangedListener;
-
 	private BackgroundThread backgroundThread;
-
 	private DataClient dataClient;
-
 	private AllDataAvailableListener allDataAvailableListener;
 
 	public DataService() {
@@ -42,7 +40,7 @@ public class DataService extends Service {
 		backgroundThread.getHandler().post(new Runnable() {
 			@Override
 			public void run() {
-				List<ShoppingItem> items = dataClient.getAllData();
+				List<ShoppingItem> items = dataClient.get();
 				if (items != null) {
 					allDataAvailableListener.allItemsAvailable(items);
 				}
@@ -52,7 +50,7 @@ public class DataService extends Service {
 			@Override
 			public void run() {
 				List<ShoppingListChange> changes = dataClient
-						.getChangesSince(new Date());
+						.getSince(new Date());
 				if (changes != null) {
 					dataChangedListener.dataChanged(changes);
 				}
@@ -70,18 +68,26 @@ public class DataService extends Service {
 	}
 
 	public void createNewItem(String newItemText) {
-		dataClient.saveNewItem(newItemText);
+		Map<String, String> data = new HashMap<String, String>();
+		data.put("value", newItemText);
+		dataClient.post(data);
 	}
 
 	public void removeItem(String id) {
-		// TODO implement me!
+		dataClient.delete(id);
 	}
 
 	public void checkItem(String id) {
-		// TODO implement me!
+		Map<String, String> data = new HashMap<String, String>();
+		data.put("id", id);
+		data.put("isChecked", Boolean.TRUE.toString());
+		dataClient.put(id, data);
 	}
 
 	public void uncheckItem(String id) {
-		// TODO implement me!
+		Map<String, String> data = new HashMap<String, String>();
+		data.put("id", id);
+		data.put("isChecked", Boolean.FALSE.toString());
+		dataClient.put(id, data);
 	}
 }
