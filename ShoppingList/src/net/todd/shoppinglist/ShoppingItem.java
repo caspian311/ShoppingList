@@ -3,9 +3,15 @@ package net.todd.shoppinglist;
 public class ShoppingItem {
 	private String value;
 	private boolean isChecked;
+	private String id;
 
-	public ShoppingItem(String value) {
+	public ShoppingItem(String id, String value) {
+		this.id = id;
 		this.value = value;
+	}
+	
+	public String getId() {
+		return this.id;
 	}
 	
 	public String getValue() {
@@ -16,7 +22,7 @@ public class ShoppingItem {
 		isChecked = true;
 	}
 	
-	public void unCheck() {
+	public void uncheck() {
 		isChecked = false;
 	}
 	

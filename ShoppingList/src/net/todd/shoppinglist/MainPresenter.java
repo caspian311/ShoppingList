@@ -3,49 +3,56 @@ package net.todd.shoppinglist;
 public class MainPresenter {
 	public static void create(final IMainView mainView,
 			final IMainModel mainModel) {
-		mainView.setup();
-		
-		mainView.addItemButtonListener(new IListener() {
+		mainView.addItemButtonListener(new IShoppingItemAddedListener() {
 			@Override
-			public void handle() {
-				mainModel.createItem(mainView.getNewItemText());
+			public void itemCreated(String value) {
+				mainModel.createItem(value);
 				mainView.clearNewItemText();
 			}
 		});
 
-		mainModel.addItemCreatedListener(new IListener() {
+		mainView.addDeleteListener(new IShoppingItemModifiedListener() {
 			@Override
-			public void handle() {
-				mainView.createNewItem(mainModel.getNewItem());
+			public void itemModified(String itemToDeleteId) {
+				mainModel.removeShoppingItem(itemToDeleteId);
+			}
+		});
+		
+		mainView.addCheckItemListener(new IShoppingItemModifiedListener() {
+			@Override
+			public void itemModified(String itemToCheckId) {
+				mainModel.checkItem(itemToCheckId);
+			}
+		});
+		
+		mainModel.addItemCreatedListener(new IShoppingItemChangeListener() {
+			@Override
+			public void shoppingItemChanged(ShoppingItem shoppingItem) {
+				mainView.createNewItem(shoppingItem.getId(), shoppingItem.getValue());
 			}
 		});
 
-		mainView.addDeleteListener(new IListener() {
+		mainModel.addItemRemovedListener(new IShoppingItemChangeListener() {
 			@Override
-			public void handle() {
-				mainModel.removeShoppingItem(mainView.getItemToDelete());
+			public void shoppingItemChanged(ShoppingItem shoppingItem) {
+				mainView.removeShoppingItem(shoppingItem.getId());
 			}
 		});
 
-		mainModel.addItemRemovedListener(new IListener() {
+		mainModel.addItemCheckedListener(new IShoppingItemChangeListener() {
 			@Override
-			public void handle() {
-				mainView.removeShoppingItem(mainModel.getItemToRemove());
+			public void shoppingItemChanged(ShoppingItem shoppingItem) {
+				mainView.checkItem(shoppingItem.getId());
 			}
 		});
-
-		mainView.addCheckItemListener(new IListener() {
+		
+		mainModel.addItemUncheckedListener(new IShoppingItemChangeListener() {
 			@Override
-			public void handle() {
-				mainModel.checkItem(mainView.getItemToCheck());
+			public void shoppingItemChanged(ShoppingItem shoppingItem) {
+				mainView.uncheckItem(shoppingItem.getId());
 			}
 		});
-
-		mainModel.addItemCheckedListener(new IListener() {
-			@Override
-			public void handle() {
-				mainView.checkItem(mainModel.getCheckedItem());
-			}
-		});
+		
+		mainView.setup();
 	}
 }

@@ -3,15 +3,13 @@ package net.todd.shoppinglist;
 public interface IMainView {
 	void setup();
 	
-	void addItemButtonListener(final IListener listener);
-	void addDeleteListener(final IListener listener);
-	void addCheckItemListener(final IListener listener);
+	void addItemButtonListener(IShoppingItemAddedListener listener);
+	void addDeleteListener(IShoppingItemModifiedListener listener);
+	void addCheckItemListener(IShoppingItemModifiedListener listener);
 	
-	String getNewItemText();
 	void clearNewItemText();
-	void createNewItem(ShoppingItem newItemValue);
-	void removeShoppingItem(ShoppingItem shoppingItem);
-	ShoppingItem getItemToDelete();
-	ShoppingItem getItemToCheck();
-	void checkItem(ShoppingItem shoppingItem);
+	void createNewItem(final String newShoppingItemId, final String newShoppingItemValue);
+	void removeShoppingItem(String shoppingItemId);
+	void checkItem(String shoppingItemId);
+	void uncheckItem(String shoppingItemId);
 }

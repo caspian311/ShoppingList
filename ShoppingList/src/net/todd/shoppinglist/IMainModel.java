@@ -1,16 +1,12 @@
 package net.todd.shoppinglist;
 
 public interface IMainModel {
-	void addItemCreatedListener(IListener listener);
-	void addItemCheckedListener(IListener iListener);
-	void addItemRemovedListener(IListener listener);
+	void addItemCreatedListener(IShoppingItemChangeListener listener);
+	void addItemRemovedListener(IShoppingItemChangeListener listener);
+	void addItemCheckedListener(IShoppingItemChangeListener iListener);
+	void addItemUncheckedListener(IShoppingItemChangeListener listener);
 	
 	void createItem(String newItemText);
-	ShoppingItem getNewItem();
-	
-	void removeShoppingItem(ShoppingItem itemToRemove);
-	ShoppingItem getItemToRemove();
-	
-	void checkItem(ShoppingItem itemToCheck);
-	ShoppingItem getCheckedItem();
+	void removeShoppingItem(String itemToRemoveId);
+	void checkItem(String itemToCheckId);
 }

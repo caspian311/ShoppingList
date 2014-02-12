@@ -17,12 +17,9 @@ import android.widget.TextView;
 public class MainView implements IMainView {
 	private Activity context;
 	
-	private IListener addItemListener;
-	private IListener deleteListener;
-	private IListener checkItemListener;
-
-	private ShoppingItem itemToDelete;
-	private ShoppingItem itemToCheck;
+	private IShoppingItemAddedListener addItemListener;
+	private IShoppingItemModifiedListener deleteListener;
+	private IShoppingItemModifiedListener checkItemListener;
 
 	public MainView(final Activity context) {
 		this.context = context;
@@ -35,25 +32,26 @@ public class MainView implements IMainView {
         addItemButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				addItemListener.handle();	
+				addItemListener.itemCreated(getNewItemText());
 			}
         });
 	}
 	
-    public void addItemButtonListener(final IListener listener) {
+	private String getNewItemText() {
+    	EditText newItemText = (EditText)context.findViewById(R.id.newItemText);
+		return newItemText.getText().toString();
+    }
+	
+    public void addItemButtonListener(final IShoppingItemAddedListener listener) {
         this.addItemListener = listener;
     }
     
-    public void addDeleteListener(final IListener listener) {
+    public void addDeleteListener(final IShoppingItemModifiedListener listener) {
     	this.deleteListener = listener;
     }
 
-    public void addCheckItemListener(final IListener listener) {
+    public void addCheckItemListener(final IShoppingItemModifiedListener listener) {
     	this.checkItemListener = listener;
-    }
-    
-    public ShoppingItem getItemToDelete() {
-    	return this.itemToDelete;
     }
     
     public void clearNewItemText() {
@@ -61,57 +59,48 @@ public class MainView implements IMainView {
 		newItemText.setText("");
     }
     
-    public String getNewItemText() {
-    	EditText newItemText = (EditText)context.findViewById(R.id.newItemText);
-		return newItemText.getText().toString();
-    }
-
-    public void createNewItem(final ShoppingItem newItemValue) {
+    public void createNewItem(final String newShoppingItemId, final String newShoppingItemValue) {
     	LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     	final ViewGroup newListItemViewGroup = (ViewGroup)inflater.inflate(R.layout.item_layout, null, false);
     	
     	TextView newItemTextView = (TextView)newListItemViewGroup.findViewById(R.id.new_item);
-    	newItemTextView.setText(newItemValue.getValue());
+    	newItemTextView.setText(newShoppingItemValue);
     	
     	LinearLayout listContents = (LinearLayout)context.findViewById(R.id.listContents);
     	listContents.addView(newListItemViewGroup, 0);
     	
-    	shoppingItemViewGroupMap.put(newItemValue, newListItemViewGroup);
+    	shoppingItemViewGroupMap.put(newShoppingItemId, newListItemViewGroup);
     	
     	newListItemViewGroup.findViewById(R.id.remove_item).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				itemToDelete = newItemValue;
-				deleteListener.handle();
+				deleteListener.itemModified(newShoppingItemId);
 			}
 		});
     	newListItemViewGroup.findViewById(R.id.check_item).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				itemToCheck = newItemValue;
-				checkItemListener.handle();
+				checkItemListener.itemModified(newShoppingItemId);
 			}
 		});
     }
     
-    public ShoppingItem getItemToCheck() {
-    	return itemToCheck;
-    }
-    
-	public void checkItem(ShoppingItem shoppingItem) {
-    	ViewGroup itemViewGroup = shoppingItemViewGroupMap.get(shoppingItem);
+	public void checkItem(String shoppingItemId) {
+    	ViewGroup itemViewGroup = shoppingItemViewGroupMap.get(shoppingItemId);
     	View checkItem = itemViewGroup.findViewById(R.id.check_item);
-    	if (shoppingItem.isChecked()) {
-    		checkItem.setBackgroundResource(R.drawable.check);
-    	} else {
-    		checkItem.setBackgroundResource(R.drawable.uncheck);
-    	}
+		checkItem.setBackgroundResource(R.drawable.check);
+    }
+	
+	public void uncheckItem(String shoppingItemId) {
+    	ViewGroup itemViewGroup = shoppingItemViewGroupMap.get(shoppingItemId);
+    	View checkItem = itemViewGroup.findViewById(R.id.check_item);
+		checkItem.setBackgroundResource(R.drawable.uncheck);
     }
     
-    private final Map<ShoppingItem, ViewGroup> shoppingItemViewGroupMap = new HashMap<ShoppingItem, ViewGroup>();
+    private final Map<String, ViewGroup> shoppingItemViewGroupMap = new HashMap<String, ViewGroup>();
     
-    public void removeShoppingItem(ShoppingItem shoppingItem) {
-    	ViewGroup viewItemToRemove = shoppingItemViewGroupMap.get(shoppingItem);
+    public void removeShoppingItem(String shoppingItemId) {
+    	ViewGroup viewItemToRemove = shoppingItemViewGroupMap.get(shoppingItemId);
     	ViewGroup parent = (ViewGroup)viewItemToRemove.getParent();
 		parent.removeView(viewItemToRemove);
     }
