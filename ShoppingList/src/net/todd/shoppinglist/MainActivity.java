@@ -26,7 +26,7 @@ public class MainActivity extends Activity {
 		super.onStart();
 
 		Intent intent = new Intent(this, DataService.class);
-		bindService(intent, connection, Context.BIND_AUTO_CREATE);
+		bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
 	}
 
 	@Override
@@ -34,12 +34,12 @@ public class MainActivity extends Activity {
 		super.onStop();
 
 		if (isBound) {
-			unbindService(connection);
+			unbindService(serviceConnection);
 			isBound = false;
 		}
 	}
 
-	private ServiceConnection connection = new ServiceConnection() {
+	private ServiceConnection serviceConnection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(ComponentName className, IBinder binder) {
 			service = ((DataServiceBinder) binder).getService();
