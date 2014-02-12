@@ -1,5 +1,7 @@
 package net.todd.shoppinglist.service;
 
+import java.util.List;
+
 public interface ResponseParser<T> {
-	T parseResponse(String response) throws Exception;
+	List<T> parseResponse(String response) throws Exception;
 }

@@ -15,12 +15,43 @@ public class DataService extends Service {
 	private final IBinder binder = new DataServiceBinder();
 
 	private DataChangedListener dataChangedListener;
-	private BackgroundThread backgroundThread;
-	private DataClient dataClient;
 	private AllDataAvailableListener allDataAvailableListener;
+	private BackgroundThread backgroundThread;
+	
+	private final long POLLING_FREQUENCY = 5 * 1000;
+	private final Runnable getChanges;
+	private final Runnable getAllItems;
+	private Date lastChangesReceived;
 
+	private final ShoppingItemsClient shoppingItemsClient;
+	private final ShoppingItemsChangesClient shoppingItemsChangesClient;
+	
 	public DataService() {
-		dataClient = new DataClient();
+		shoppingItemsClient = new ShoppingItemsClient();
+		shoppingItemsChangesClient = new ShoppingItemsChangesClient();
+		
+		getChanges = new Runnable() {
+			@Override
+			public void run() {
+				List<ShoppingListChange> changes = shoppingItemsChangesClient.getSince(lastChangesReceived);
+				lastChangesReceived = new Date();
+				if (changes != null) {
+					dataChangedListener.dataChanged(changes);
+				}
+				backgroundThread.getHandler().postDelayed(getChanges, POLLING_FREQUENCY);
+			}
+		};
+		getAllItems = new Runnable() {
+			@Override
+			public void run() {
+				List<ShoppingItem> items = shoppingItemsClient.get();
+				lastChangesReceived = new Date();
+				if (items != null) {
+					allDataAvailableListener.allItemsAvailable(items);
+				}
+				backgroundThread.getHandler().postDelayed(getChanges, POLLING_FREQUENCY);
+			}
+		};
 	}
 
 	public class DataServiceBinder extends Binder {
@@ -33,61 +64,49 @@ public class DataService extends Service {
 	public IBinder onBind(Intent intent) {
 		return binder;
 	}
+	
+	@Override
+	public boolean onUnbind(Intent intent) {
+		boolean onUnbind = super.onUnbind(intent);
+		backgroundThread.quit();
+		return onUnbind;
+	}
 
 	public void start() {
 		backgroundThread = new BackgroundThread();
 		backgroundThread.start();
-		backgroundThread.getHandler().post(new Runnable() {
-			@Override
-			public void run() {
-				List<ShoppingItem> items = dataClient.get();
-				if (items != null) {
-					allDataAvailableListener.allItemsAvailable(items);
-				}
-			}
-		});
-		backgroundThread.getHandler().post(new Runnable() {
-			@Override
-			public void run() {
-				List<ShoppingListChange> changes = dataClient
-						.getSince(new Date());
-				if (changes != null) {
-					dataChangedListener.dataChanged(changes);
-				}
-			}
-		});
+		backgroundThread.getHandler().post(getAllItems);
 	}
 
 	public void addDataChangedListener(DataChangedListener dataChangedListener) {
 		this.dataChangedListener = dataChangedListener;
 	}
 
-	public void addGetAllDataListener(
-			AllDataAvailableListener allDataAvailableListener) {
+	public void addGetAllDataListener(AllDataAvailableListener allDataAvailableListener) {
 		this.allDataAvailableListener = allDataAvailableListener;
 	}
 
 	public void createNewItem(String newItemText) {
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("value", newItemText);
-		dataClient.post(data);
+		shoppingItemsClient.post(data);
 	}
 
 	public void removeItem(String id) {
-		dataClient.delete(id);
+		shoppingItemsClient.delete(id);
 	}
 
 	public void checkItem(String id) {
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("id", id);
 		data.put("isChecked", Boolean.TRUE.toString());
-		dataClient.put(id, data);
+		shoppingItemsClient.put(id, data);
 	}
 
 	public void uncheckItem(String id) {
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("id", id);
 		data.put("isChecked", Boolean.FALSE.toString());
-		dataClient.put(id, data);
+		shoppingItemsClient.put(id, data);
 	}
 }
