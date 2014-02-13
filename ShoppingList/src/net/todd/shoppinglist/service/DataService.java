@@ -10,8 +10,11 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
 
 public class DataService extends Service {
+	protected static final String TAG = DataService.class.toString();
+
 	private final IBinder binder = new DataServiceBinder();
 
 	private DataChangedListener dataChangedListener;
@@ -33,6 +36,7 @@ public class DataService extends Service {
 		getChanges = new Runnable() {
 			@Override
 			public void run() {
+				Log.i(TAG, "Fetching changes");
 				List<ShoppingListChange> changes = shoppingItemsChangesClient.getSince(lastChangesReceived);
 				lastChangesReceived = new Date();
 				if (changes != null) {
@@ -44,6 +48,7 @@ public class DataService extends Service {
 		getAllItems = new Runnable() {
 			@Override
 			public void run() {
+				Log.i(TAG, "Fetching all items");
 				List<ShoppingItem> items = shoppingItemsClient.get();
 				lastChangesReceived = new Date();
 				if (items != null) {
@@ -62,17 +67,23 @@ public class DataService extends Service {
 
 	@Override
 	public IBinder onBind(Intent intent) {
+		Log.i(TAG, "Binding DataService");
+		start();
 		return binder;
 	}
 	
 	@Override
 	public boolean onUnbind(Intent intent) {
-		boolean onUnbind = super.onUnbind(intent);
-		backgroundThread.quit();
-		return onUnbind;
+		Log.i(TAG, "Unbinding DataService");
+		stop();
+		return true;
 	}
 
-	public void start() {
+	private void stop() {
+		backgroundThread.quit();		
+	}
+
+	private void start() {
 		backgroundThread = new BackgroundThread();
 		backgroundThread.start();
 		backgroundThread.getHandler().post(getAllItems);

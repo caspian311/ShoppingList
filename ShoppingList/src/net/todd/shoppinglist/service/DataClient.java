@@ -44,6 +44,7 @@ public class DataClient<T> implements IDataClient<T> {
 	}
 
 	private void execute(HttpRequestBase request) {
+		Log.i(TAG, "http exec: " + request.getRequestLine());
 		execute(request, null);
 	}
 

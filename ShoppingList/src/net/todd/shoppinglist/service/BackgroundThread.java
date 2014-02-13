@@ -15,6 +15,7 @@ public class BackgroundThread extends Thread {
 	
 	@Override
 	public void run() {
+		Log.i(TAG, "Background thread starting up");
 		try {
 			Looper.prepare();
 			
@@ -25,6 +26,7 @@ public class BackgroundThread extends Thread {
 		} catch (Exception e) {
 			Log.e(TAG, "Looper died: " + e.getMessage());
 		}
+		Log.i(TAG, "Background thread finished");
 	}
 	
 	public void quit() {
