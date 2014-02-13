@@ -30,6 +30,8 @@ public class DataService extends Service {
 	private final ShoppingItemsChangesClient shoppingItemsChangesClient;
 	
 	public DataService() {
+		Log.i(TAG, "DataService instantiated");
+		
 		shoppingItemsClient = new ShoppingItemsClient();
 		shoppingItemsChangesClient = new ShoppingItemsChangesClient();
 		
@@ -61,6 +63,7 @@ public class DataService extends Service {
 
 	public class DataServiceBinder extends Binder {
 		public DataService getService() {
+			Log.i(TAG, "instance of service requested");
 			return DataService.this;
 		}
 	}
@@ -68,7 +71,10 @@ public class DataService extends Service {
 	@Override
 	public IBinder onBind(Intent intent) {
 		Log.i(TAG, "Binding DataService");
-		start();
+		
+		backgroundThread = new BackgroundThread();
+		backgroundThread.start();
+		
 		return binder;
 	}
 	
@@ -83,9 +89,7 @@ public class DataService extends Service {
 		backgroundThread.quit();		
 	}
 
-	private void start() {
-		backgroundThread = new BackgroundThread();
-		backgroundThread.start();
+	public void start() {
 		backgroundThread.getHandler().post(getAllItems);
 	}
 

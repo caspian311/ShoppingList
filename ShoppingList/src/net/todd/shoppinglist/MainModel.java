@@ -49,6 +49,7 @@ public class MainModel implements IMainModel {
 				}
 			}
 		});
+		service.start();
 	}
 
 	@Override

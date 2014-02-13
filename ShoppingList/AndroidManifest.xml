@@ -25,6 +25,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <service
+        	android:name=".service.DataService" android:enabled="true">
+        	<intent-filter>
+            	<action android:name="net.todd.shippinglist.service.DataService" />
+        	</intent-filter>
+       	</service>
 
     </application>
 
