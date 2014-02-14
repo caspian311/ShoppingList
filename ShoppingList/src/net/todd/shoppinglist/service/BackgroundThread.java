@@ -9,8 +9,12 @@ public class BackgroundThread extends Thread {
 	private Handler handler;
 	private Looper myLooper;
 
-	public Handler getHandler() {
-		return handler;
+	public void scheduleTask(Runnable runnable) {
+		handler.post(runnable);
+	}
+	
+	public void scheduleTask(Runnable runnable, long delayMillis) {
+		handler.postDelayed(runnable, delayMillis);
 	}
 	
 	@Override

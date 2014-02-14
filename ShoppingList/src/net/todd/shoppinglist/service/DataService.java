@@ -1,14 +1,12 @@
 package net.todd.shoppinglist.service;
 
-import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import net.todd.shoppinglist.ShoppingItem;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -21,11 +19,6 @@ public class DataService extends Service {
 	private AllDataAvailableListener allDataAvailableListener;
 	private BackgroundThread backgroundThread;
 	
-	private final long POLLING_FREQUENCY = 5 * 1000;
-	private final Runnable getChanges;
-	private final Runnable getAllItems;
-	private Date lastChangesReceived;
-
 	private final ShoppingItemsClient shoppingItemsClient;
 	private final ShoppingItemsChangesClient shoppingItemsChangesClient;
 	
@@ -34,31 +27,6 @@ public class DataService extends Service {
 		
 		shoppingItemsClient = new ShoppingItemsClient();
 		shoppingItemsChangesClient = new ShoppingItemsChangesClient();
-		
-		getChanges = new Runnable() {
-			@Override
-			public void run() {
-				Log.i(TAG, "Fetching changes");
-				List<ShoppingListChange> changes = shoppingItemsChangesClient.getSince(lastChangesReceived);
-				lastChangesReceived = new Date();
-				if (changes != null) {
-					dataChangedListener.dataChanged(changes);
-				}
-				backgroundThread.getHandler().postDelayed(getChanges, POLLING_FREQUENCY);
-			}
-		};
-		getAllItems = new Runnable() {
-			@Override
-			public void run() {
-				Log.i(TAG, "Fetching all items");
-				List<ShoppingItem> items = shoppingItemsClient.get();
-				lastChangesReceived = new Date();
-				if (items != null) {
-					allDataAvailableListener.allItemsAvailable(items);
-				}
-				backgroundThread.getHandler().postDelayed(getChanges, POLLING_FREQUENCY);
-			}
-		};
 	}
 
 	public class DataServiceBinder extends Binder {
@@ -90,7 +58,11 @@ public class DataService extends Service {
 	}
 
 	public void start() {
-		backgroundThread.getHandler().post(getAllItems);
+		Handler uiHandler = new Handler();
+		GetChangesTask getChangesTask = new GetChangesTask(shoppingItemsChangesClient, dataChangedListener, backgroundThread, uiHandler);
+		GetAllItemsTask getAllItems = new GetAllItemsTask(shoppingItemsClient, allDataAvailableListener, backgroundThread, getChangesTask, uiHandler);
+		
+		backgroundThread.scheduleTask(getAllItems);
 	}
 
 	public void addDataChangedListener(DataChangedListener dataChangedListener) {
