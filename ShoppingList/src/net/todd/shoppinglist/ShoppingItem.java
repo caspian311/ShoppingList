@@ -5,9 +5,10 @@ public class ShoppingItem {
 	private boolean isChecked;
 	private String id;
 
-	public ShoppingItem(String id, String value) {
+	public ShoppingItem(String id, String value, boolean isChecked) {
 		this.id = id;
 		this.value = value;
+		this.isChecked = isChecked;
 	}
 	
 	public String getId() {

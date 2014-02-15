@@ -75,7 +75,7 @@ public class DataService extends Service {
 
 	public void createNewItem(String newItemText) {
 		Map<String, String> data = new HashMap<String, String>();
-		data.put("value", newItemText);
+		data.put("name", newItemText);
 		shoppingItemsClient.post(data);
 	}
 
@@ -85,15 +85,13 @@ public class DataService extends Service {
 
 	public void checkItem(String id) {
 		Map<String, String> data = new HashMap<String, String>();
-		data.put("id", id);
-		data.put("isChecked", Boolean.TRUE.toString());
+		data.put("checked", Boolean.TRUE.toString());
 		shoppingItemsClient.put(id, data);
 	}
 
 	public void uncheckItem(String id) {
 		Map<String, String> data = new HashMap<String, String>();
-		data.put("id", id);
-		data.put("isChecked", Boolean.FALSE.toString());
+		data.put("checked", Boolean.FALSE.toString());
 		shoppingItemsClient.put(id, data);
 	}
 }

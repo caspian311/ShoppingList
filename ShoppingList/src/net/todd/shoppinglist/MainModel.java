@@ -92,7 +92,7 @@ public class MainModel implements IMainModel {
 	}
 
 	private void itemCreated(ShoppingListChange change) {
-		ShoppingItem newItem = new ShoppingItem(change.getId(), change.getName());
+		ShoppingItem newItem = new ShoppingItem(change.getId(), change.getName(), false);
 		itemCreatedListener.shoppingItemChanged(newItem);
 	}
 

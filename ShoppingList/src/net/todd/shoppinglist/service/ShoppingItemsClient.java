@@ -22,7 +22,8 @@ private static final String BASE_URL = "http://10.0.2.2/app";
 			public ShoppingItem parseItem(JSONObject json) throws Exception {
 				String id = json.getString("id");
 				String value = json.getString("value");
-				return new ShoppingItem(id, value);
+				boolean checked = json.getBoolean("checked");
+				return new ShoppingItem(id, value, checked);
 			}
 		});
 	}
