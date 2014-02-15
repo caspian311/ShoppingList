@@ -5,7 +5,7 @@ var ShoppingItems = function() {
    this.markItem = function(id, isChecked, callback) {
       var checked = isChecked ? 1 : 0;
       base.inConnection(function(db) {
-         db.collection('shoppingItems').update({ '_id': ObjectID(id) }, { checked: checked }, function(err) {
+         db.collection('shoppingItems').update({ '_id': ObjectID(id) }, { $set: { 'checked': checked } }, function(err) {
             if (err) {
                throw err;
             }
