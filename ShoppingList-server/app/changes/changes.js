@@ -1,11 +1,13 @@
-var Cards = function() {
-   this.get = function(request, response) {
-      response.json({});
-   };
+var changesDb = require('../db/changesDb')
 
-   this.post = function(request, response) {
+var Changes = function() {
+   this.get = function(request, response) {
+      var since = request.query.since;
+      changesDb.allChangesSince(since, function(docs) {
+         response.json(docs)
+      });
    };
 }
 
-module.exports = new Cards();
+module.exports = new Changes();
 

@@ -4,7 +4,6 @@ var app = require('express')()
 app.locals.pretty = true;
 
 app.get('/changes', cards.get);
-app.post('/changes', cards.post);
 
 module.exports = app;
 
