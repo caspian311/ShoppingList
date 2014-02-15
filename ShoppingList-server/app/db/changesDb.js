@@ -15,14 +15,8 @@ var Changes = function() {
    };
 
    var objectIdWithTimestamp = function(timestamp) {
-      if (typeof(timestamp) == 'string') {
-         timestamp = new Date(timestamp);
-      }
-
       var hexSeconds = Math.floor(timestamp/1000).toString(16);
-      var constructedObjectId = ObjectId(hexSeconds + "0000000000000000");
-
-      return constructedObjectId
+      return ObjectId = ObjectID(hexSeconds + "0000000000000000");
    }
 
    this.allChangesSince = function(timestamp, callback) {
