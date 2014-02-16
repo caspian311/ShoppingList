@@ -74,24 +74,44 @@ public class DataService extends Service {
 	}
 
 	public void createNewItem(String newItemText) {
-		Map<String, String> data = new HashMap<String, String>();
+		final Map<String, String> data = new HashMap<String, String>();
 		data.put("name", newItemText);
-		shoppingItemsClient.post(data);
+		backgroundThread.scheduleImmediateTask(new Runnable() {
+			@Override
+			public void run() {
+				shoppingItemsClient.post(data);
+			}
+		});
 	}
 
-	public void removeItem(String id) {
-		shoppingItemsClient.delete(id);
+	public void removeItem(final String id) {
+		backgroundThread.scheduleImmediateTask(new Runnable() {
+			@Override
+			public void run() {
+				shoppingItemsClient.delete(id);
+			}
+		});
 	}
 
-	public void checkItem(String id) {
-		Map<String, String> data = new HashMap<String, String>();
+	public void checkItem(final String id) {
+		final Map<String, String> data = new HashMap<String, String>();
 		data.put("checked", Boolean.TRUE.toString());
-		shoppingItemsClient.put(id, data);
+		backgroundThread.scheduleImmediateTask(new Runnable() {
+			@Override
+			public void run() {
+				shoppingItemsClient.put(id, data);
+			}
+		});
 	}
 
-	public void uncheckItem(String id) {
-		Map<String, String> data = new HashMap<String, String>();
+	public void uncheckItem(final String id) {
+		final Map<String, String> data = new HashMap<String, String>();
 		data.put("checked", Boolean.FALSE.toString());
-		shoppingItemsClient.put(id, data);
+		backgroundThread.scheduleImmediateTask(new Runnable() {
+			@Override
+			public void run() {
+				shoppingItemsClient.put(id, data);
+			}
+		});
 	}
 }

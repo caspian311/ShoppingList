@@ -14,7 +14,6 @@ public class ShoppingListChange {
 		this.id = id;
 		this.changeType = changeType;
 		this.name = name;
-		
 	}
 	
 	public String getId() {

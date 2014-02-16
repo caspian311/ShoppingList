@@ -4,12 +4,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import android.util.Log;
+
 import net.todd.shoppinglist.service.AllDataAvailableListener;
 import net.todd.shoppinglist.service.DataChangedListener;
 import net.todd.shoppinglist.service.DataService;
 import net.todd.shoppinglist.service.ShoppingListChange;
 
 public class MainModel implements IMainModel {
+	private static final String TAG = MainModel.class.toString();
+	
 	private IShoppingItemChangeListener itemCreatedListener;
 	private IShoppingItemChangeListener itemRemovedListener;
 	private IShoppingItemChangeListener itemCheckedListener;
@@ -85,15 +89,20 @@ public class MainModel implements IMainModel {
 
 	@Override
 	public void checkItem(String itemToCheckId) {
-		if (allItems.get(itemToCheckId).isChecked()) {
+		boolean isChecked = allItems.get(itemToCheckId).isChecked();
+		Log.i(TAG, "item " + itemToCheckId + " is " + (isChecked ? "checked" : "unchecked"));
+		if (isChecked) {
+			Log.i(TAG, "marking item " + itemToCheckId + " as unchecked ");
 			service.uncheckItem(itemToCheckId);
 		} else {
+			Log.i(TAG, "marking item " + itemToCheckId + " as checked ");
 			service.checkItem(itemToCheckId);
 		}
 	}
 
 	private void itemCreated(ShoppingListChange change) {
 		ShoppingItem newItem = new ShoppingItem(change.getId(), change.getName(), false);
+		allItems.put(change.getId(), newItem);
 		itemCreatedListener.shoppingItemChanged(newItem);
 	}
 

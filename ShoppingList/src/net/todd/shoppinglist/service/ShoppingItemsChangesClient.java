@@ -20,9 +20,12 @@ private static final String BASE_URL = "http://10.0.2.2:3000";
 			@Override
 			public ShoppingListChange parseItem(JSONObject json)
 					throws Exception {
-				String id = json.getString("id");
+				String id = json.getString("itemId");
 				int changeType = json.getInt("changeType");
-				String name = json.getString("name");
+				String name = null;
+				if (changeType == ShoppingListChange.CREATED) {
+					name = json.getString("name");
+				}
 				return new ShoppingListChange(id, changeType, name);
 			}
 		});

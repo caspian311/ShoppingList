@@ -13,6 +13,10 @@ public class BackgroundThread extends Thread {
 		handler.post(runnable);
 	}
 	
+	public void scheduleImmediateTask(Runnable runnable) {
+		handler.postAtFrontOfQueue(runnable);
+	}
+	
 	public void scheduleTask(Runnable runnable, long delayMillis) {
 		handler.postDelayed(runnable, delayMillis);
 	}

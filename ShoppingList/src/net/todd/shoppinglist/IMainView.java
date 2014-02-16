@@ -8,7 +8,7 @@ public interface IMainView {
 	void addCheckItemListener(IShoppingItemModifiedListener listener);
 	
 	void clearNewItemText();
-	void createNewItem(final String newShoppingItemId, final String newShoppingItemValue);
+	void createNewItem(String id, String value, boolean isChecked);
 	void removeShoppingItem(String shoppingItemId);
 	void checkItem(String shoppingItemId);
 	void uncheckItem(String shoppingItemId);

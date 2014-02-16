@@ -64,12 +64,12 @@ public class MainView implements IMainView {
 		newItemText.setText("");
     }
     
-    public void createNewItem(String id, String value) {
-    	createWidget(id, value);
+    public void createNewItem(String id, String value, boolean isChecked) {
+    	createWidget(id, value, isChecked);
     	attachEventing(id);
     }
     
-    private void createWidget(String id, String value) {
+    private void createWidget(String id, String value, boolean isChecked) {
     	LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     	final ViewGroup newListItemViewGroup = (ViewGroup)inflater.inflate(R.layout.item_layout, null, false);
     	
@@ -80,6 +80,10 @@ public class MainView implements IMainView {
     	listContents.addView(newListItemViewGroup, 0);
     	
     	shoppingItemViewGroupMap.put(id, newListItemViewGroup);
+    	
+    	if (isChecked) {
+    		checkItem(id);
+    	}
     }
 
 	private void attachEventing(final String newShoppingItemId) {

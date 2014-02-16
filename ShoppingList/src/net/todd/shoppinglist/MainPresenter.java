@@ -28,7 +28,7 @@ public class MainPresenter {
 		mainModel.addItemCreatedListener(new IShoppingItemChangeListener() {
 			@Override
 			public void shoppingItemChanged(ShoppingItem shoppingItem) {
-				mainView.createNewItem(shoppingItem.getId(), shoppingItem.getValue());
+				mainView.createNewItem(shoppingItem.getId(), shoppingItem.getValue(), shoppingItem.isChecked());
 			}
 		});
 

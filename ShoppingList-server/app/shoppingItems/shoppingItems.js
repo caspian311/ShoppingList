@@ -50,18 +50,14 @@ var ShoppingItems = function() {
 
    this.put = function(request, response) {
       var id = request.params.id;
-      var isChecked = request.body.checked;
-      var change = {
-         itemId: id
-      };
-
-      if (isChecked) {
-         change.changeType = 2;
-      } else {
-         change.changeType = 3;
-      }
+      var isChecked = request.body.checked == 'true';
 
       shoppingItemsDb.markItem(id, isChecked, function(docs) {
+         var change = {
+            itemId: id,
+            changeType: isChecked ? 2 : 3
+         };
+
          changesDb.addChange(change, function() {
             response.status(201);
             response.end();

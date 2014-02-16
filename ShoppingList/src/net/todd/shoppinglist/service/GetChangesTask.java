@@ -8,7 +8,7 @@ import android.util.Log;
 
 public class GetChangesTask implements Runnable {
 	private static final String TAG = GetChangesTask.class.toString();
-	public static final int POLLING_FREQUENCY = 15 * 1000;
+	public static final int POLLING_FREQUENCY = 1 * 1000;
 	
 	private Date lastChangesReceived;
 	private ShoppingItemsChangesClient dataClient;
@@ -26,9 +26,9 @@ public class GetChangesTask implements Runnable {
 	@Override
 	public void run() {
 		Log.i(TAG, "Fetching changes");
-		lastChangesReceived = new Date();
 		final List<ShoppingListChange> changes = dataClient.getSince(lastChangesReceived);
-		if (changes != null) {
+		lastChangesReceived = new Date();
+		if (changes != null && changes.size() > 0) {
 			uiHandler.post(new Runnable() {
 				@Override
 				public void run() {
