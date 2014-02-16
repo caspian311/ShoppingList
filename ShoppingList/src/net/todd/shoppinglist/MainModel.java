@@ -45,6 +45,7 @@ public class MainModel implements IMainModel {
 			@Override
 			public void allItemsAvailable(List<ShoppingItem> allItems) {
 				for (ShoppingItem shoppingItem : allItems) {
+					MainModel.this.allItems.put(shoppingItem.getId(), shoppingItem);
 					itemCreatedListener.shoppingItemChanged(shoppingItem);
 				}
 			}

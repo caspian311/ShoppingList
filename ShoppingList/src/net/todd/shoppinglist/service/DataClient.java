@@ -16,11 +16,10 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.BasicHttpParams;
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import android.util.Log;
 
@@ -34,30 +33,30 @@ public class DataClient<T> implements IDataClient<T> {
 	}
 	
 	private HttpGet createGetWithParameters(String url, Map<String, String> params) {
-		HttpGet get = new HttpGet(url);
-		BasicHttpParams httpParams = new BasicHttpParams();
+		List<NameValuePair> requestParameters = new ArrayList<NameValuePair>();
 		for (String parameter : params.keySet()) {
-			httpParams.setParameter(parameter, params.get(parameter));
+			requestParameters.add(new BasicNameValuePair(parameter, params.get(parameter)));
 		}
-		get.setParams(httpParams);
-		return get;
+		url += "?" + URLEncodedUtils.format(requestParameters, "utf-8");
+		return new HttpGet(url);
 	}
 
 	private void execute(HttpRequestBase request) {
-		Log.i(TAG, "http exec: " + request.getRequestLine());
 		execute(request, null);
 	}
 
 	private List<T> execute(HttpRequestBase request, ResponseParser<T> responseHandler) {
-		HttpClient client = new DefaultHttpClient();
+		Log.i(TAG, "http exec: " + request.getRequestLine());
 		try {
-			HttpResponse response = client.execute(request);
+			HttpResponse response = new DefaultHttpClient().execute(request);
 			int statusCode = response.getStatusLine().getStatusCode();
 			if (statusCode == HttpStatus.SC_OK) {
 				ByteArrayOutputStream out = new ByteArrayOutputStream();
 				response.getEntity().writeTo(out);
 				out.close();
 				return responseHandler.parseResponse(out.toString());
+			} else if (statusCode == HttpStatus.SC_CREATED) {
+				return null;
 			} else {
 				throw new Exception("Status code " + statusCode);
 			}
@@ -93,8 +92,7 @@ public class DataClient<T> implements IDataClient<T> {
 			throws Exception {
 		List<T> list = new ArrayList<T>();
 
-		JSONArray changes = new JSONObject(jsonDataAsString)
-				.getJSONArray("data");
+		JSONArray changes = new JSONArray(jsonDataAsString);
 		for (int i = 0; i < changes.length(); i++) {
 			list.add(parser.parseItem(changes.getJSONObject(i)));
 		}

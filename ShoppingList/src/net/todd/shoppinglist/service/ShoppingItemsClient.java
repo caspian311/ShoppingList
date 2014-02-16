@@ -3,14 +3,16 @@ package net.todd.shoppinglist.service;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONObject;
-
 import net.todd.shoppinglist.ShoppingItem;
 
-public class ShoppingItemsClient {
+import org.json.JSONObject;
 
-private static final String BASE_URL = "http://10.0.2.2/app";
+import android.util.Log;
+
+public class ShoppingItemsClient {
+	protected static final String TAG = ShoppingItemsClient.class.toString();
 	
+	private static final String BASE_URL = "http://10.0.2.2:3000";
 	private static final String SHOPPING_ITEMS_URL = BASE_URL + "/shoppingItems";
 	private static final String SHOPPING_ITEMS_URL_WITH_ID = BASE_URL + "/shoppingItems/%s";
 
@@ -20,10 +22,11 @@ private static final String BASE_URL = "http://10.0.2.2/app";
 		dataClient = new DataClient<ShoppingItem>(new Parser<ShoppingItem>() {
 			@Override
 			public ShoppingItem parseItem(JSONObject json) throws Exception {
+				Log.i(TAG, "json received: " + json);
 				String id = json.getString("id");
-				String value = json.getString("value");
-				boolean checked = json.getBoolean("checked");
-				return new ShoppingItem(id, value, checked);
+				String name = json.getString("name");
+				boolean checked = json.getInt("checked") == 1;
+				return new ShoppingItem(id, name, checked);
 			}
 		});
 	}

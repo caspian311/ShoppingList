@@ -4,7 +4,13 @@ var shoppingItemsDb = require('../db/shoppingItemsDb')
 var ShoppingItems = function() {
    this.index = function(request, response) {
       shoppingItemsDb.allItems(function(docs) {
-         response.json(docs);
+         response.json(docs.map(function(doc) {
+            return {
+               id: doc._id,
+               name: doc.name,
+               checked: doc.checked
+            };
+         }));
       });
    };
 
