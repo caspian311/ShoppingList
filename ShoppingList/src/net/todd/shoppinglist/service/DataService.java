@@ -15,18 +15,15 @@ public class DataService extends Service {
 
 	private final IBinder binder = new DataServiceBinder();
 
-	private DataChangedListener dataChangedListener;
 	private AllDataAvailableListener allDataAvailableListener;
 	private BackgroundThread backgroundThread;
 	
 	private final ShoppingItemsClient shoppingItemsClient;
-	private final ShoppingItemsChangesClient shoppingItemsChangesClient;
 	
 	public DataService() {
 		Log.i(TAG, "DataService instantiated");
 		
 		shoppingItemsClient = new ShoppingItemsClient();
-		shoppingItemsChangesClient = new ShoppingItemsChangesClient();
 	}
 
 	public class DataServiceBinder extends Binder {
@@ -59,26 +56,23 @@ public class DataService extends Service {
 
 	public void start() {
 		Handler uiHandler = new Handler();
-		GetChangesTask getChangesTask = new GetChangesTask(shoppingItemsChangesClient, dataChangedListener, backgroundThread, uiHandler);
-		GetAllItemsTask getAllItems = new GetAllItemsTask(shoppingItemsClient, allDataAvailableListener, backgroundThread, getChangesTask, uiHandler);
+		GetAllItemsTask getAllItems = new GetAllItemsTask(shoppingItemsClient, allDataAvailableListener, backgroundThread, uiHandler);
 		
 		backgroundThread.scheduleTask(getAllItems);
-	}
-
-	public void addDataChangedListener(DataChangedListener dataChangedListener) {
-		this.dataChangedListener = dataChangedListener;
 	}
 
 	public void addGetAllDataListener(AllDataAvailableListener allDataAvailableListener) {
 		this.allDataAvailableListener = allDataAvailableListener;
 	}
 
-	public void createNewItem(String newItemText) {
-		final Map<String, String> data = new HashMap<String, String>();
-		data.put("name", newItemText);
+	public void createNewItem(final String id, final String name) {
 		backgroundThread.scheduleImmediateTask(new Runnable() {
 			@Override
 			public void run() {
+				Map<String, String> data = new HashMap<String, String>();
+				data.put("id", id);
+				data.put("name", name);
+				
 				shoppingItemsClient.post(data);
 			}
 		});
@@ -93,23 +87,15 @@ public class DataService extends Service {
 		});
 	}
 
-	public void checkItem(final String id) {
-		final Map<String, String> data = new HashMap<String, String>();
-		data.put("checked", Boolean.TRUE.toString());
+	public void updateItem(final String id, final String value, final boolean isChecked) {
 		backgroundThread.scheduleImmediateTask(new Runnable() {
 			@Override
 			public void run() {
-				shoppingItemsClient.put(id, data);
-			}
-		});
-	}
-
-	public void uncheckItem(final String id) {
-		final Map<String, String> data = new HashMap<String, String>();
-		data.put("checked", Boolean.FALSE.toString());
-		backgroundThread.scheduleImmediateTask(new Runnable() {
-			@Override
-			public void run() {
+				Map<String, String> data = new HashMap<String, String>();
+				data.put("id", id);
+				data.put("value", value);
+				data.put("checked", isChecked ? "1" : "0");
+				
 				shoppingItemsClient.put(id, data);
 			}
 		});

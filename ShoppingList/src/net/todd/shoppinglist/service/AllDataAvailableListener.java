@@ -1,9 +1,9 @@
 package net.todd.shoppinglist.service;
 
-import java.util.List;
+import java.util.Map;
 
 import net.todd.shoppinglist.ShoppingItem;
 
 public interface AllDataAvailableListener {
-	void allItemsAvailable(List<ShoppingItem> allItems);
+	void allItemsAvailable(Map<String, ShoppingItem> remoteItems);
 }

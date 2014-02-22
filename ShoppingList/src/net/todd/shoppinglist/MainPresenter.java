@@ -25,31 +25,28 @@ public class MainPresenter {
 			}
 		});
 		
-		mainModel.addItemCreatedListener(new IShoppingItemChangeListener() {
+		mainModel.addItemCreatedListener(new IShoppingItemCreatedListener() {
 			@Override
 			public void shoppingItemChanged(ShoppingItem shoppingItem) {
 				mainView.createNewItem(shoppingItem.getId(), shoppingItem.getValue(), shoppingItem.isChecked());
 			}
 		});
 
-		mainModel.addItemRemovedListener(new IShoppingItemChangeListener() {
+		mainModel.addItemRemovedListener(new IShoppingItemRemovedListener() {
 			@Override
-			public void shoppingItemChanged(ShoppingItem shoppingItem) {
-				mainView.removeShoppingItem(shoppingItem.getId());
+			public void shoppingItemRemoved(String shoppingItemId) {
+				mainView.removeShoppingItem(shoppingItemId);
 			}
 		});
 
-		mainModel.addItemCheckedListener(new IShoppingItemChangeListener() {
+		mainModel.addItemCheckListener(new IShoppingItemChangeListener() {
 			@Override
 			public void shoppingItemChanged(ShoppingItem shoppingItem) {
-				mainView.checkItem(shoppingItem.getId());
-			}
-		});
-		
-		mainModel.addItemUncheckedListener(new IShoppingItemChangeListener() {
-			@Override
-			public void shoppingItemChanged(ShoppingItem shoppingItem) {
-				mainView.uncheckItem(shoppingItem.getId());
+				if (shoppingItem.isChecked()) {
+					mainView.checkItem(shoppingItem.getId());
+				} else {
+					mainView.uncheckItem(shoppingItem.getId());
+				}
 			}
 		});
 		

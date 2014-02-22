@@ -1,125 +1,162 @@
 package net.todd.shoppinglist;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
-import android.util.Log;
-
-import net.todd.shoppinglist.service.AllDataAvailableListener;
-import net.todd.shoppinglist.service.DataChangedListener;
 import net.todd.shoppinglist.service.DataService;
-import net.todd.shoppinglist.service.ShoppingListChange;
 
 public class MainModel implements IMainModel {
-	private static final String TAG = MainModel.class.toString();
-	
-	private IShoppingItemChangeListener itemCreatedListener;
-	private IShoppingItemChangeListener itemRemovedListener;
-	private IShoppingItemChangeListener itemCheckedListener;
-	private IShoppingItemChangeListener itemUncheckedListener;
+	private final List<IShoppingItemCreatedListener> itemCreatedListeners = new ArrayList<IShoppingItemCreatedListener>();
+	private final List<IShoppingItemRemovedListener> itemRemovedListeners = new ArrayList<IShoppingItemRemovedListener>();
+	private final List<IShoppingItemChangeListener> itemCheckedListeners = new ArrayList<IShoppingItemChangeListener>();
 
-	private final DataService service;
 	private final Map<String, ShoppingItem> allItems = new HashMap<String, ShoppingItem>();
+	
+	private final DataService dataService;
 
-	public MainModel(DataService service) {
-		this.service = service;
-		service.addDataChangedListener(new DataChangedListener() {
-			@Override
-			public void dataChanged(List<ShoppingListChange> changes) {
-				for (ShoppingListChange change : changes) {
-					switch(change.getChangeType()) {
-					case ShoppingListChange.CREATED:
-						itemCreated(change);
-						break;
-					case ShoppingListChange.DELETED:
-						itemDeleted(change);
-						break;
-					case ShoppingListChange.CHECKED:
-						itemChecked(change);
-						break;
-					case ShoppingListChange.UNCHECKED:
-						itemUnchecked(change);
-						break;
-					}
-				}
-			}
-		});
-		service.addGetAllDataListener(new AllDataAvailableListener() {
-			@Override
-			public void allItemsAvailable(List<ShoppingItem> allItems) {
-				for (ShoppingItem shoppingItem : allItems) {
-					MainModel.this.allItems.put(shoppingItem.getId(), shoppingItem);
-					itemCreatedListener.shoppingItemChanged(shoppingItem);
-				}
-			}
-		});
-		service.start();
-	}
-
-	@Override
-	public void addItemCreatedListener(IShoppingItemChangeListener listener) {
-		this.itemCreatedListener = listener;
+	public MainModel(DataService dataService) {
+		this.dataService = dataService;
 	}
 	
 	@Override
-	public void addItemRemovedListener(IShoppingItemChangeListener listener) {
-		itemRemovedListener = listener;
+	public void addItemCreatedListener(IShoppingItemCreatedListener listener) {
+		this.itemCreatedListeners.add(listener);
 	}
 	
 	@Override
-	public void addItemCheckedListener(IShoppingItemChangeListener listener) {
-		this.itemCheckedListener = listener;
+	public void addItemRemovedListener(IShoppingItemRemovedListener listener) {
+		itemRemovedListeners.add(listener);
 	}
 	
 	@Override
-	public void addItemUncheckedListener(IShoppingItemChangeListener listener) {
-		this.itemUncheckedListener = listener;
+	public void addItemCheckListener(IShoppingItemChangeListener listener) {
+		this.itemCheckedListeners.add(listener);
 	}
-
+	
 	@Override
 	public void createItem(String newItemText) {
-		service.createNewItem(newItemText);
+		ShoppingItem newItem = new ShoppingItem(UUID.randomUUID().toString(), newItemText, false);
+		itemCreated(newItem);
+		
+		dataService.createNewItem(newItem.getId(), newItem.getValue());
+	}
+
+	private void itemCreated(ShoppingItem newItem) {
+		allItems.put(newItem.getId(), newItem);
+		notifyCreatedListeners(newItem);
+	}
+	
+	private void notifyCreatedListeners(ShoppingItem shoppingItem) {
+		for (IShoppingItemCreatedListener itemCreatedListener : itemCreatedListeners) {
+			itemCreatedListener.shoppingItemChanged(shoppingItem);
+		}
 	}
 	
 	@Override
 	public void removeShoppingItem(String itemToRemoveId) {
-		service.removeItem(itemToRemoveId);
+		itemRemoved(itemToRemoveId);
+		
+		dataService.removeItem(itemToRemoveId);
 	}
 
+	private void itemRemoved(String itemToRemoveId) {
+		allItems.remove(itemToRemoveId);
+		notifyRemovedListeners(itemToRemoveId);
+	}
+
+	private void notifyRemovedListeners(String shoppingItemId) {
+		for (IShoppingItemRemovedListener itemRemovedListener : itemRemovedListeners) {
+			itemRemovedListener.shoppingItemRemoved(shoppingItemId);
+		}
+	}
+	
 	@Override
 	public void checkItem(String itemToCheckId) {
-		boolean isChecked = allItems.get(itemToCheckId).isChecked();
-		Log.i(TAG, "item " + itemToCheckId + " is " + (isChecked ? "checked" : "unchecked"));
-		if (isChecked) {
-			Log.i(TAG, "marking item " + itemToCheckId + " as unchecked ");
-			service.uncheckItem(itemToCheckId);
+		ShoppingItem item = allItems.get(itemToCheckId);
+		if (item.isChecked()) {
+			item.uncheck();	
 		} else {
-			Log.i(TAG, "marking item " + itemToCheckId + " as checked ");
-			service.checkItem(itemToCheckId);
+			item.check();
+		}
+		
+		notifyCheckListeners(item);
+		
+		dataService.updateItem(item.getId(), item.getValue(), item.isChecked());
+	}
+	
+	private void notifyCheckListeners(ShoppingItem shoppingItem) {
+		for (IShoppingItemChangeListener itemCheckedListener : itemCheckedListeners) {
+			itemCheckedListener.shoppingItemChanged(shoppingItem);
+		}
+	}
+	
+	@Override
+	public void mergeItems(Map<String, ShoppingItem> remoteItems) {
+		Set<String> itemsToBeRemoved = getItemsToBeRemoved(this.allItems.keySet(), remoteItems.keySet());
+		removeItemsToBeRemoved(itemsToBeRemoved);
+
+		Set<String> itemsToBeAdded = getItemsToBeAdded(this.allItems.keySet(), remoteItems.keySet());
+		addItemsToBeAdded(itemsToBeAdded, remoteItems);
+		
+		Set<String> itemsToBeUpdated = getItemsToBeUpdated(this.allItems, remoteItems);
+		updateItemsToBeUpdated(itemsToBeUpdated, remoteItems);
+	}
+
+	private void updateItemsToBeUpdated(Set<String> itemsToBeUpdated, Map<String, ShoppingItem> remoteItems) {
+		for (String id : itemsToBeUpdated) {
+			this.allItems.put(id, remoteItems.get(id));
+			notifyCheckListeners(this.allItems.get(id));
 		}
 	}
 
-	private void itemCreated(ShoppingListChange change) {
-		ShoppingItem newItem = new ShoppingItem(change.getId(), change.getName(), false);
-		allItems.put(change.getId(), newItem);
-		itemCreatedListener.shoppingItemChanged(newItem);
+	private Set<String> getItemsToBeUpdated(Map<String, ShoppingItem> allItems, Map<String, ShoppingItem> remoteItems) {
+		Set<String> itemsToBeUpdated = new HashSet<String>();
+		for (String id : remoteItems.keySet()) {
+			ShoppingItem remoteItem = remoteItems.get(id);
+			ShoppingItem localItem = allItems.get(id);
+			
+			if (!remoteItem.equals(localItem)) {
+				itemsToBeUpdated.add(id);
+			}
+		}
+		return itemsToBeUpdated;
 	}
 
-	private void itemDeleted(ShoppingListChange change) {
-		ShoppingItem itemToRemove = allItems.remove(change.getId());
-		itemRemovedListener.shoppingItemChanged(itemToRemove);
+	private void removeItemsToBeRemoved(Set<String> itemsToBeRemoved) {
+		for (String id : itemsToBeRemoved) {
+			itemRemoved(id);
+		}
 	}
 
-	private void itemChecked(ShoppingListChange change) {
-		ShoppingItem checkedItem = allItems.get(change.getId());
-		checkedItem.check();
-		itemCheckedListener.shoppingItemChanged(checkedItem);
+	private void addItemsToBeAdded(Set<String> itemsToBeAdded, Map<String, ShoppingItem> remoteItems) {
+		for (String id : itemsToBeAdded) {
+			ShoppingItem itemToAdd = remoteItems.get(id);
+			itemCreated(itemToAdd);
+		}
 	}
-	
-	private void itemUnchecked(ShoppingListChange change) {
-		ShoppingItem checkedItem = allItems.get(change.getId());
-		checkedItem.uncheck();
-		itemUncheckedListener.shoppingItemChanged(checkedItem);
+
+	private Set<String> getItemsToBeAdded(Set<String> localIds, Set<String> remoteIds) {
+		Set<String> idsToBeAdded = new HashSet<String>();
+		for (String id : remoteIds) {
+			if (!localIds.contains(id)) {
+				idsToBeAdded.add(id);
+			}
+		}
+		return idsToBeAdded;
+	}
+
+	private Set<String> getItemsToBeRemoved(Set<String> localIds, Set<String> remoteIds) {
+		Set<String> idsNotInRemote = new HashSet<String>();
+		for (String id : localIds) {
+			if (!remoteIds.contains(id)) {
+				idsNotInRemote.add(id);
+			}
+		}
+		return idsNotInRemote;
 	}
 }

@@ -1,6 +1,7 @@
 package net.todd.shoppinglist;
 
 import net.todd.shoppinglist.service.DataService;
+import net.todd.shoppinglist.service.ServicePresenter;
 import net.todd.shoppinglist.service.DataService.DataServiceBinder;
 import android.app.Activity;
 import android.content.ComponentName;
@@ -35,7 +36,9 @@ public class MainActivity extends Activity {
 	}
 
 	private void setupApp() {
-		MainPresenter.create(new MainView(this), new MainModel(service));
+		MainModel mainModel = new MainModel(service);
+		MainPresenter.create(new MainView(this), mainModel);
+		ServicePresenter.create(service, mainModel);
 	}
 	
 	@Override
