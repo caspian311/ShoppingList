@@ -65,13 +65,13 @@ public class DataService extends Service {
 		this.allDataAvailableListener = allDataAvailableListener;
 	}
 
-	public void createNewItem(final String id, final String name) {
+	public void createNewItem(final String id, final String value) {
 		backgroundThread.scheduleImmediateTask(new Runnable() {
 			@Override
 			public void run() {
 				Map<String, String> data = new HashMap<String, String>();
 				data.put("id", id);
-				data.put("name", name);
+				data.put("value", value);
 				
 				shoppingItemsClient.post(data);
 			}

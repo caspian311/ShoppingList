@@ -24,9 +24,9 @@ public class ShoppingItemsClient {
 			public ShoppingItem parseItem(JSONObject json) throws Exception {
 				Log.i(TAG, "json received: " + json);
 				String id = json.getString("id");
-				String name = json.getString("name");
-				boolean checked = json.getInt("checked") == 1;
-				return new ShoppingItem(id, name, checked);
+				String value = json.getString("value");
+				boolean checked = json.getBoolean("checked");
+				return new ShoppingItem(id, value, checked);
 			}
 		});
 	}

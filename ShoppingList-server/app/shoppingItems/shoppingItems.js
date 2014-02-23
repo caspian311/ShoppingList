@@ -1,5 +1,4 @@
 var shoppingItemsDb = require('../db/shoppingItemsDb')
-   , changesDb = require('../db/changesDb')
 
 var ShoppingItems = function() {
    this.index = function(request, response) {
@@ -7,7 +6,7 @@ var ShoppingItems = function() {
          response.json(docs.map(function(doc) {
             return {
                id: doc._id,
-               name: doc.name,
+               value: doc.value,
                checked: doc.checked
             };
          }));
@@ -16,8 +15,8 @@ var ShoppingItems = function() {
 
    this.post = function(request, response) {
       var item = {
-         name: request.body.name,
-         checked: 0
+         value: request.body.value,
+         checked: false
       };
 
       shoppingItemsDb.addItem(item, function(itemInDb) {
@@ -37,10 +36,12 @@ var ShoppingItems = function() {
 
    this.put = function(request, response) {
       var id = request.params.id;
-      var item = request.body;
-      var item.checked = request.body.checked == 'true';
+      var item = {
+         value: request.body.value,
+         checked: request.body.checked == '1'
+      };
 
-      shoppingItemsDb.markItem(id, item, function(docs) {
+      shoppingItemsDb.updateItem(id, item, function(docs) {
          response.status(201);
          response.end();
       });

@@ -2,14 +2,13 @@ var ObjectID = require('mongodb').ObjectID
    , base = require('./base')
 
 var ShoppingItems = function() {
-   var collection = function() {
+   var collection = function(db) {
       return db.collection('shoppingItems');
    }
 
-   this.updateItem = function(item, callback) {
-      var checked = isChecked ? 1 : 0;
+   this.updateItem = function(id, item, callback) {
       base.inConnection(function(db) {
-         collection().update({ '_id': ObjectID(item.id) }, item, function(err) {
+         collection(db).update({ '_id': ObjectID(id) }, item, function(err) {
             if (err) {
                throw err;
             }
@@ -21,7 +20,7 @@ var ShoppingItems = function() {
 
    this.addItem = function(item, callback) {
       base.inConnection(function(db) {
-         collection().insert(item, function(err, addedItems) {
+         collection(db).insert(item, function(err, addedItems) {
             if (err) {
                throw err;
             }
@@ -33,7 +32,7 @@ var ShoppingItems = function() {
 
    this.getAllItems = function(callback) {
       base.inConnection(function(db) {
-         collection().find({}).toArray(function(err, docs) {
+         collection(db).find({}).toArray(function(err, docs) {
             if (err) {
                throw err;
             }
@@ -45,7 +44,7 @@ var ShoppingItems = function() {
 
    this.deleteItem = function(id, callback) {
       base.inConnection(function(db) {
-         collection().remove({ '_id': ObjectID(id) }, function(err) {
+         collection(db).remove({ '_id': ObjectID(id) }, function(err) {
             if (err) {
                throw err;
             }
