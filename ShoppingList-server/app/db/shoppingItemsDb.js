@@ -2,10 +2,14 @@ var ObjectID = require('mongodb').ObjectID
    , base = require('./base')
 
 var ShoppingItems = function() {
-   this.markItem = function(id, isChecked, callback) {
+   var collection = function() {
+      return db.collection('shoppingItems');
+   }
+
+   this.updateItem = function(item, callback) {
       var checked = isChecked ? 1 : 0;
       base.inConnection(function(db) {
-         db.collection('shoppingItems').update({ '_id': ObjectID(id) }, { $set: { 'checked': checked } }, function(err) {
+         collection().update({ '_id': ObjectID(item.id) }, item, function(err) {
             if (err) {
                throw err;
             }
@@ -17,7 +21,7 @@ var ShoppingItems = function() {
 
    this.addItem = function(item, callback) {
       base.inConnection(function(db) {
-         db.collection('shoppingItems').insert(item, function(err, addedItems) {
+         collection().insert(item, function(err, addedItems) {
             if (err) {
                throw err;
             }
@@ -27,9 +31,9 @@ var ShoppingItems = function() {
       });
    };
 
-   this.allItems = function(callback) {
+   this.getAllItems = function(callback) {
       base.inConnection(function(db) {
-         db.collection('shoppingItems').find({}).toArray(function(err, docs) {
+         collection().find({}).toArray(function(err, docs) {
             if (err) {
                throw err;
             }
@@ -41,7 +45,7 @@ var ShoppingItems = function() {
 
    this.deleteItem = function(id, callback) {
       base.inConnection(function(db) {
-         db.collection('shoppingItems').remove({ '_id': ObjectID(id) }, function(err) {
+         collection().remove({ '_id': ObjectID(id) }, function(err) {
             if (err) {
                throw err;
             }

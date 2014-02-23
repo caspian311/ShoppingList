@@ -3,7 +3,7 @@ var shoppingItemsDb = require('../db/shoppingItemsDb')
 
 var ShoppingItems = function() {
    this.index = function(request, response) {
-      shoppingItemsDb.allItems(function(docs) {
+      shoppingItemsDb.getAllItems(function(docs) {
          response.json(docs.map(function(doc) {
             return {
                id: doc._id,
@@ -21,15 +21,8 @@ var ShoppingItems = function() {
       };
 
       shoppingItemsDb.addItem(item, function(itemInDb) {
-         var change = {
-            itemId: itemInDb._id,
-            name: itemInDb.name,
-            changeType: 0
-         };
-         changesDb.addChange(change, function() {
-            response.status(201);
-            response.end();
-         });
+         response.status(201);
+         response.end();
       });
    };
 
@@ -37,31 +30,19 @@ var ShoppingItems = function() {
       var id = request.params.id;
 
       shoppingItemsDb.deleteItem(id, function() {
-         var change = {
-            itemId: id,
-            changeType: 1
-         };
-         changesDb.addChange(change, function() {
-            response.status(201);
-            response.end();
-         });
+         response.status(201);
+         response.end();
       });
    };
 
    this.put = function(request, response) {
       var id = request.params.id;
-      var isChecked = request.body.checked == 'true';
+      var item = request.body;
+      var item.checked = request.body.checked == 'true';
 
-      shoppingItemsDb.markItem(id, isChecked, function(docs) {
-         var change = {
-            itemId: id,
-            changeType: isChecked ? 2 : 3
-         };
-
-         changesDb.addChange(change, function() {
-            response.status(201);
-            response.end();
-         });
+      shoppingItemsDb.markItem(id, item, function(docs) {
+         response.status(201);
+         response.end();
       });
    };
 }
