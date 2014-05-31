@@ -1,5 +1,6 @@
 package net.todd.shoppinglist.service;
 
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -7,14 +8,14 @@ import net.todd.shoppinglist.ShoppingItem;
 
 import org.json.JSONObject;
 
+import android.os.Build;
 import android.util.Log;
 
 public class ShoppingItemsClient {
 	protected static final String TAG = ShoppingItemsClient.class.toString();
 	
-	private static final String BASE_URL = "http://10.0.2.2:3000";
-	private static final String SHOPPING_ITEMS_URL = BASE_URL + "/shoppingItems";
-	private static final String SHOPPING_ITEMS_URL_WITH_ID = BASE_URL + "/shoppingItems/%s";
+	private static final String DEFAULT_BASE_URL = "http://10.0.2.2:3000";
+	private static final String PRODUCTION_BASE_URL = "http://caspian311-shoppinglist.herokuapp.com";
 
 	private IDataClient<ShoppingItem> dataClient;
 	
@@ -32,22 +33,33 @@ public class ShoppingItemsClient {
 	}
 	
 	public List<ShoppingItem> get() {
-		return dataClient.get(SHOPPING_ITEMS_URL);
+		return dataClient.get(shoppingItemsUrl());
+	}
+	
+	private String shoppingItemsUrl() {
+		return MessageFormat.format("{0}/shoppingItems", baseUrl());
+	}
+	
+	private String shoppingItemsUrlWithId(String id) {
+		return MessageFormat.format("{0}/shoppingItems/{1}", baseUrl(), id);
+	}
+
+	private String baseUrl() {
+		if (Build.PRODUCT.contains("sdk")) {
+			return DEFAULT_BASE_URL;
+		}
+		return PRODUCTION_BASE_URL;
 	}
 
 	public void post(Map<String, String> data) {
-		dataClient.post(SHOPPING_ITEMS_URL, data);
+		dataClient.post(shoppingItemsUrl(), data);
 	}
 
 	public void delete(String id) {
-		dataClient.delete(createUrlWithId(id));
+		dataClient.delete(shoppingItemsUrlWithId(id));
 	}
 
 	public void put(String id, Map<String, String> data) {
-		dataClient.put(createUrlWithId(id), data);
-	}
-
-	private String createUrlWithId(String id) {
-		return String.format(SHOPPING_ITEMS_URL_WITH_ID, id);
+		dataClient.put(shoppingItemsUrlWithId(id), data);
 	}
 }
