@@ -1,8 +1,6 @@
 package net.todd.shoppinglist.service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import net.todd.shoppinglist.ShoppingItem;
 import android.os.Handler;
@@ -15,13 +13,16 @@ public class GetAllItemsTask implements Runnable {
 	
 	private final ShoppingItemsClient dataClient;
 	private final BackgroundThread backgroundThread;
-	private final AllDataAvailableListener allDataAvailableListener;
+	private final DataAvailableListener dataAvailableListener;
 
 	private Handler uiHandler;
+
+	private FetchDataNotifyier fetchDataHandler;
 	
-	public GetAllItemsTask(ShoppingItemsClient dataClient, AllDataAvailableListener allDataAvailableListener, BackgroundThread backgroundThread, Handler uiHandler) {
+	public GetAllItemsTask(ShoppingItemsClient dataClient, FetchDataNotifyier fetchDataHandler, DataAvailableListener dataAvailableListener, BackgroundThread backgroundThread, Handler uiHandler) {
 		this.dataClient = dataClient;
-		this.allDataAvailableListener = allDataAvailableListener;
+		this.fetchDataHandler = fetchDataHandler;
+		this.dataAvailableListener = dataAvailableListener;
 		this.backgroundThread = backgroundThread;
 		this.uiHandler = uiHandler;
 	}
@@ -29,25 +30,21 @@ public class GetAllItemsTask implements Runnable {
 	@Override
 	public void run() {
 		Log.i(TAG, "Fetching all items");
+		uiHandler.post(new Runnable() {
+			@Override
+			public void run() {
+				fetchDataHandler.notifyDataBeingFetched();
+			}
+		});
 		final List<ShoppingItem> items = dataClient.get();
 		if (items != null) {
 			uiHandler.post(new Runnable() {
-
 				@Override
 				public void run() {
-					Map<String, ShoppingItem> remoteItems = hashifyItems(items);
-					allDataAvailableListener.allItemsAvailable(remoteItems);
+					dataAvailableListener.allItemsAvailable(items);
 				}
 			});
 		}
 		backgroundThread.scheduleTask(this, POLLING_FREQUENCY);
-	}
-	
-	private Map<String, ShoppingItem> hashifyItems(List<ShoppingItem> remoteItems) {
-		Map<String, ShoppingItem> map = new HashMap<String, ShoppingItem>();
-		for (ShoppingItem shoppingItem : remoteItems) {
-			map.put(shoppingItem.getId(), shoppingItem);
-		}
-		return map;
 	}
 }

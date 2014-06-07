@@ -1,16 +1,22 @@
 package net.todd.shoppinglist.service;
 
-import java.util.Map;
+import java.util.List;
 
-import net.todd.shoppinglist.IMainModel;
+import net.todd.shoppinglist.MainModel;
 import net.todd.shoppinglist.ShoppingItem;
 
 public class ServicePresenter {
-	public static void create(final DataService service, final IMainModel mainModel) {
-		service.addGetAllDataListener(new AllDataAvailableListener() {
+	public static void create(final DataService service, final MainModel mainModel) {
+		service.addFetchingDataListener(new FetchDataNotifyier() {
+			public void notifyDataBeingFetched() {
+				mainModel.showSpinner();
+			}
+		});
+		service.addDataAvailableListener(new DataAvailableListener() {
 			@Override
-			public void allItemsAvailable(Map<String, ShoppingItem> allItems) {
+			public void allItemsAvailable(List<ShoppingItem> allItems) {
 				mainModel.mergeItems(allItems);
+				mainModel.hideSpinner();
 			}
 		});
 		

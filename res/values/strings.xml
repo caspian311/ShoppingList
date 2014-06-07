@@ -2,8 +2,10 @@
 <resources>
 
     <string name="app_name">Shopping List</string>
+    <string name="sub_title">The Todd\'s shopping items</string>
     <string name="addItemButtonText">Add Item</string>
     <string name="remove_item_text">Remove Item</string>
     <string name="check_item_text">Check Item</string>
+    <string name="syncing">Syncing</string>
 
 </resources>

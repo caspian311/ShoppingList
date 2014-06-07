@@ -15,10 +15,12 @@ public class DataService extends Service {
 
 	private final IBinder binder = new DataServiceBinder();
 
-	private AllDataAvailableListener allDataAvailableListener;
+	private DataAvailableListener dataAvailableListener;
+	private FetchDataNotifyier fetchingDataListener;
 	private BackgroundThread backgroundThread;
 	
 	private final ShoppingItemsClient shoppingItemsClient;
+
 	
 	public DataService() {
 		Log.i(TAG, "DataService instantiated");
@@ -56,13 +58,13 @@ public class DataService extends Service {
 
 	public void start() {
 		Handler uiHandler = new Handler();
-		GetAllItemsTask getAllItems = new GetAllItemsTask(shoppingItemsClient, allDataAvailableListener, backgroundThread, uiHandler);
+		GetAllItemsTask getAllItems = new GetAllItemsTask(shoppingItemsClient, fetchingDataListener, dataAvailableListener, backgroundThread, uiHandler);
 		
 		backgroundThread.scheduleTask(getAllItems);
 	}
 
-	public void addGetAllDataListener(AllDataAvailableListener allDataAvailableListener) {
-		this.allDataAvailableListener = allDataAvailableListener;
+	public void addDataAvailableListener(DataAvailableListener dataAvailableListener) {
+		this.dataAvailableListener = dataAvailableListener;
 	}
 
 	public void createNewItem(final String id, final String value) {
@@ -99,5 +101,9 @@ public class DataService extends Service {
 				shoppingItemsClient.put(id, data);
 			}
 		});
+	}
+
+	public void addFetchingDataListener(FetchDataNotifyier listener) {
+		this.fetchingDataListener = listener;
 	}
 }
