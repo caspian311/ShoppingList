@@ -5,8 +5,10 @@ import java.util.List;
 import android.widget.ArrayAdapter;
 
 public class MainModel {
+	protected static final String TAG = MainModel.class.toString();
 	private ArrayAdapter<ShoppingItem> adapter;
 	private SpinnerController spinnerController;
+	private IShoppingItemRemovedListener shoppingItemRemovedListener;
 
 	public MainModel(ArrayAdapter<ShoppingItem> adapter, SpinnerController spinnerController) {
 		this.adapter = adapter;
@@ -24,5 +26,14 @@ public class MainModel {
 
 	public void hideSpinner() {
 		spinnerController.hide();
+	}
+
+	public void deleteShoppingItem(ShoppingItem shoppingItem) {
+		shoppingItemRemovedListener.shoppingItemRemoved(shoppingItem.getId());
+	}
+
+	public void addDeleteListener(
+			IShoppingItemRemovedListener shoppingItemRemovedListener) {
+				this.shoppingItemRemovedListener = shoppingItemRemovedListener;
 	}
 }

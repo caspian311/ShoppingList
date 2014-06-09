@@ -19,7 +19,7 @@ import android.view.MenuItem;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.android.apps.dashclock.ui.SwipeDismissListViewTouchListener;
+import com.google.android.apps.dashclock.ui.DismissCallbacks;
 
 public class MainActivity extends Activity {
 	protected static final String TAG = MainActivity.class.toString();
@@ -28,6 +28,7 @@ public class MainActivity extends Activity {
 
 	private Menu actionBarMenu;
 	private ShoppingItemAdapter adapter;
+	private MainModel mainModel;
 
 	enum Direction {
 		RIGHT, LEFT
@@ -76,24 +77,22 @@ public class MainActivity extends Activity {
 		ListView listView = (ListView) findViewById(R.id.listview);
 		listView.setAdapter(adapter);
 
-		SwipeDismissListViewTouchListener touchListener = new SwipeDismissListViewTouchListener(
-				listView,
-				new SwipeDismissListViewTouchListener.DismissCallbacks() {
-					public void onDismiss(ListView listView,
-							int[] reverseSortedPositions) {
-						for (int position : reverseSortedPositions) {
-							adapter.remove(adapter.getItem(position));
-						}
-						adapter.notifyDataSetChanged();
-					}
+		SwipeToDismiss.addBehaviorTo(listView, new DismissCallbacks() {
+			@Override
+			public void onDismiss(ListView listView, int[] positions) {
+				for (int position : positions) {
+					ShoppingItem shoppingItem = adapter.getItem(position);
+					mainModel.deleteShoppingItem(shoppingItem);
+					adapter.remove(shoppingItem);
+				}
+				adapter.notifyDataSetChanged();
+			}
 
-					@Override
-					public boolean canDismiss(int position) {
-						return true;
-					}
-				});
-		listView.setOnTouchListener(touchListener);
-		listView.setOnScrollListener(touchListener.makeScrollListener());
+			@Override
+			public boolean canDismiss(int position) {
+				return true;
+			}
+		});
 	}
 
 	@Override
@@ -118,7 +117,7 @@ public class MainActivity extends Activity {
 	private void setUpApp() {
 		SpinnerController spinnerController = new SpinnerController(
 				MainActivity.this, actionBarMenu);
-		MainModel mainModel = new MainModel(adapter, spinnerController);
+		mainModel = new MainModel(adapter, spinnerController);
 
 		ServicePresenter.create(service, mainModel);
 	}

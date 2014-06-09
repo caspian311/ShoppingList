@@ -2,6 +2,7 @@ package net.todd.shoppinglist.service;
 
 import java.util.List;
 
+import net.todd.shoppinglist.IShoppingItemRemovedListener;
 import net.todd.shoppinglist.MainModel;
 import net.todd.shoppinglist.ShoppingItem;
 
@@ -17,6 +18,12 @@ public class ServicePresenter {
 			public void allItemsAvailable(List<ShoppingItem> allItems) {
 				mainModel.mergeItems(allItems);
 				mainModel.hideSpinner();
+			}
+		});
+		mainModel.addDeleteListener(new IShoppingItemRemovedListener() {
+			@Override
+			public void shoppingItemRemoved(String shoppingItemId) {
+				service.removeItem(shoppingItemId);
 			}
 		});
 		
