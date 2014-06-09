@@ -19,7 +19,7 @@ public class DataService extends Service {
 	private FetchDataNotifyier fetchingDataListener;
 	private BackgroundThread backgroundThread;
 	
-	private final ShoppingItemsClient shoppingItemsClient;
+	private final IShoppingItemsClient shoppingItemsClient;
 
 	
 	public DataService() {
@@ -85,20 +85,6 @@ public class DataService extends Service {
 			@Override
 			public void run() {
 				shoppingItemsClient.delete(id);
-			}
-		});
-	}
-
-	public void updateItem(final String id, final String value, final boolean isChecked) {
-		backgroundThread.scheduleImmediateTask(new Runnable() {
-			@Override
-			public void run() {
-				Map<String, String> data = new HashMap<String, String>();
-				data.put("id", id);
-				data.put("value", value);
-				data.put("checked", isChecked ? "1" : "0");
-				
-				shoppingItemsClient.put(id, data);
 			}
 		});
 	}

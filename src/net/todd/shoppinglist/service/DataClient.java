@@ -13,7 +13,6 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -131,13 +130,5 @@ public class DataClient<T> implements IDataClient<T> {
 
 	private HttpDelete createDelete(String url) {
 		return new HttpDelete(url);
-	}
-
-	public void put(String url, Map<String, String> data) {
-		execute(createPut(url, data));
-	}
-
-	private HttpEntityEnclosingRequestBase createPut(String url, Map<String, String> data) {
-		return attachDataToRequest(new HttpPut(url), data);
 	}
 }

@@ -11,7 +11,7 @@ public class GetAllItemsTask implements Runnable {
 
 	private static final long POLLING_FREQUENCY = 10 * 1000;
 	
-	private final ShoppingItemsClient dataClient;
+	private final IShoppingItemsClient dataClient;
 	private final BackgroundThread backgroundThread;
 	private final DataAvailableListener dataAvailableListener;
 
@@ -19,7 +19,7 @@ public class GetAllItemsTask implements Runnable {
 
 	private FetchDataNotifyier fetchDataHandler;
 	
-	public GetAllItemsTask(ShoppingItemsClient dataClient, FetchDataNotifyier fetchDataHandler, DataAvailableListener dataAvailableListener, BackgroundThread backgroundThread, Handler uiHandler) {
+	public GetAllItemsTask(IShoppingItemsClient dataClient, FetchDataNotifyier fetchDataHandler, DataAvailableListener dataAvailableListener, BackgroundThread backgroundThread, Handler uiHandler) {
 		this.dataClient = dataClient;
 		this.fetchDataHandler = fetchDataHandler;
 		this.dataAvailableListener = dataAvailableListener;

@@ -11,7 +11,7 @@ import org.json.JSONObject;
 import android.os.Build;
 import android.util.Log;
 
-public class ShoppingItemsClient {
+public class ShoppingItemsClient implements IShoppingItemsClient {
 	protected static final String TAG = ShoppingItemsClient.class.toString();
 	
 	private static final String DEFAULT_BASE_URL = "http://10.0.2.2:3000";
@@ -26,8 +26,7 @@ public class ShoppingItemsClient {
 				Log.i(TAG, "json received: " + json);
 				String id = json.getString("id");
 				String value = json.getString("value");
-				boolean checked = json.getBoolean("checked");
-				return new ShoppingItem(id, value, checked);
+				return new ShoppingItem(id, value);
 			}
 		});
 	}
@@ -57,9 +56,5 @@ public class ShoppingItemsClient {
 
 	public void delete(String id) {
 		dataClient.delete(shoppingItemsUrlWithId(id));
-	}
-
-	public void put(String id, Map<String, String> data) {
-		dataClient.put(shoppingItemsUrlWithId(id), data);
 	}
 }
