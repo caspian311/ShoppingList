@@ -2,11 +2,8 @@ package net.todd.shoppinglist;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
-import android.database.Cursor;
 import android.net.Uri;
-import android.util.Log;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ListContentProvider extends ContentProvider {
@@ -17,10 +14,8 @@ public class ListContentProvider extends ContentProvider {
 
     @Override
     public ShoppingListCursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        List<ShoppingListItem> data = new ArrayList<ShoppingListItem>();
-        data.add(new ShoppingListItem());
-        data.get(0).setName("monkey");
-        Log.i("monkey", "loading " + uri.toString());
+        WebService webService = new WebService();
+        List<ShoppingListItem> data = webService.getAll("http://10.0.2.2:3000/shoppingItems", new ShoppingListItemParser());
         return new ShoppingListCursor(data);
     }
 
