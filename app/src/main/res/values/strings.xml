@@ -8,5 +8,6 @@
     <string name="delete_button_text">Delete?</string>
     <string name="cancel_delete_button">Nevermind</string>
     <string name="no_items_available">No items are available at this time</string>
+    <string name="create_new_item">Create Item</string>
 
 </resources>

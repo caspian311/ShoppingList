@@ -7,6 +7,7 @@ import android.content.AsyncQueryHandler;
 import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
@@ -23,6 +24,8 @@ import android.widget.TextView;
 
 public class MainActivity extends Activity implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final int SHOPPING_LIST_LOADER = 1;
+    private static final int NEW_ITEM_REQUEST = Activity.RESULT_FIRST_USER + 1;
+
     private Uri uri;
     private SimpleCursorAdapter adapter;
 
@@ -79,20 +82,33 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
         findViewById(R.id.add_item_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ContentValues contentValues = new ContentValues();
-                contentValues.put("value", "monkey");
-
-                new AsyncQueryHandler(getContentResolver()) {
-                    @Override
-                    protected void onInsertComplete(int token, Object cookie, Uri uri) {
-                        super.onInsertComplete(token, cookie, uri);
-                        getLoaderManager().restartLoader(SHOPPING_LIST_LOADER, null, MainActivity.this);
-                    }
-                }.startInsert(-1, null, uri, contentValues);
+                startActivityForResult(new Intent(MainActivity.this, NewItemActivity.class), NEW_ITEM_REQUEST);
             }
         });
 
         getLoaderManager().restartLoader(SHOPPING_LIST_LOADER, null, this);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == Activity.RESULT_OK) {
+            doInsert(data.getStringExtra(NewItemActivity.NEW_ITEM_NAME));
+        }
+    }
+
+    private void doInsert(String newItemName) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("value", newItemName);
+
+        new AsyncQueryHandler(getContentResolver()) {
+            @Override
+            protected void onInsertComplete(int token, Object cookie, Uri uri) {
+                super.onInsertComplete(token, cookie, uri);
+                getLoaderManager().restartLoader(SHOPPING_LIST_LOADER, null, MainActivity.this);
+            }
+        }.startInsert(-1, null, uri, contentValues);
     }
 
     @Override
