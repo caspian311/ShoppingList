@@ -2,9 +2,12 @@ package net.todd.shoppinglist;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.LoaderManager;
 import android.content.AsyncQueryHandler;
 import android.content.ContentValues;
+import android.content.CursorLoader;
 import android.content.DialogInterface;
+import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -18,10 +21,10 @@ import android.widget.ResourceCursorAdapter;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
-public class MainActivity extends Activity {
-    private LoaderCallback loaderCallback;
-
+public class MainActivity extends Activity implements LoaderManager.LoaderCallbacks<Cursor> {
+    private static final int SHOPPING_LIST_LOADER = 1;
     private Uri uri;
+    private SimpleCursorAdapter adapter;
 
     public MainActivity() {
         this.uri = Uri.parse("content://net.todd.shoppinglist");
@@ -32,13 +35,12 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.shopping_item, null, new String[]{"name"}, new int[]{R.id.shopping_item_name}, 0);
+        adapter = new SimpleCursorAdapter(this, R.layout.shopping_item, null, new String[]{"name"}, new int[]{R.id.shopping_item_name}, 0);
 
         ListView listView = (ListView) findViewById(R.id.list);
         listView.setAdapter(adapter);
 
-        loaderCallback = new LoaderCallback(adapter, this);
-        getLoaderManager().initLoader(0, null, loaderCallback);
+        getLoaderManager().initLoader(SHOPPING_LIST_LOADER, null, this);
     }
 
     @Override
@@ -62,7 +64,7 @@ public class MainActivity extends Activity {
                                             protected void onDeleteComplete(int token, Object cookie, int result) {
                                                 super.onDeleteComplete(token, cookie, result);
 
-                                                getLoaderManager().restartLoader(0, null, loaderCallback);
+                                                getLoaderManager().restartLoader(SHOPPING_LIST_LOADER, null, MainActivity.this);
                                             }
                                         }.startDelete(-1, null, uri, "" + id, null);
                                     }
@@ -84,13 +86,13 @@ public class MainActivity extends Activity {
                     @Override
                     protected void onInsertComplete(int token, Object cookie, Uri uri) {
                         super.onInsertComplete(token, cookie, uri);
-                        getLoaderManager().restartLoader(0, null, loaderCallback);
+                        getLoaderManager().restartLoader(SHOPPING_LIST_LOADER, null, MainActivity.this);
                     }
                 }.startInsert(-1, null, uri, contentValues);
             }
         });
 
-        getLoaderManager().restartLoader(0, null, loaderCallback);
+        getLoaderManager().restartLoader(SHOPPING_LIST_LOADER, null, this);
     }
 
     @Override
@@ -101,6 +103,23 @@ public class MainActivity extends Activity {
         listView.setOnItemClickListener(null);
         findViewById(R.id.add_item_button).setOnClickListener(null);
 
-        getLoaderManager().destroyLoader(0);
+        getLoaderManager().destroyLoader(SHOPPING_LIST_LOADER);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(this, Uri.parse("content://net.todd.shoppinglist"),
+                null, null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        adapter.swapCursor(data);
+        findViewById(R.id.no_items_available).setVisibility(adapter.getCount() == 0 ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        adapter.swapCursor(null);
     }
 }

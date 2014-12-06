@@ -12,6 +12,12 @@
         <ListView android:id="@+id/list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/no_items_available"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/no_items_available"
+            android:visibility="gone" />
 
         </RelativeLayout>
 
