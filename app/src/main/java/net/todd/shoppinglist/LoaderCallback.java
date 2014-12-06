@@ -7,13 +7,13 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.widget.SimpleCursorAdapter;
+import android.widget.ResourceCursorAdapter;
 
 public class LoaderCallback implements LoaderManager.LoaderCallbacks<Cursor> {
-    private SimpleCursorAdapter adapter;
+    private ResourceCursorAdapter adapter;
     private Context context;
 
-    public LoaderCallback(SimpleCursorAdapter adapter, Context context) {
+    public LoaderCallback(ResourceCursorAdapter adapter, Context context) {
         this.adapter = adapter;
         this.context = context;
     }

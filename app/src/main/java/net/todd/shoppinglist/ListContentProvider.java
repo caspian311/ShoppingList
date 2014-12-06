@@ -3,6 +3,7 @@ package net.todd.shoppinglist;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.net.Uri;
+import android.util.Log;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ public class ListContentProvider extends ContentProvider {
     @Override
     public ShoppingListCursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         WebService webService = new WebService();
-        List<ShoppingListItem> data = webService.getAll("http://10.0.2.2:3000/shoppingItems", new ShoppingListItemParser());
+        List<ShoppingListItem> data = webService.getAll("http://10.0.3.2:3000/shoppingItems", new ShoppingListItemParser());
         return new ShoppingListCursor(data);
     }
 
@@ -26,6 +27,8 @@ public class ListContentProvider extends ContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
+        Log.i("shopping list", "inserting content values: " + values);
+        new WebService().post("http://10.0.3.2:3000/shoppingItems", values);
         return null;
     }
 

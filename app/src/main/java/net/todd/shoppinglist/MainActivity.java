@@ -1,8 +1,16 @@
 package net.todd.shoppinglist;
 
 import android.app.Activity;
+import android.content.AsyncQueryHandler;
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.UserDictionary;
+import android.view.View;
 import android.widget.ListView;
+import android.widget.ResourceCursorAdapter;
 import android.widget.SimpleCursorAdapter;
 
 public class MainActivity extends Activity {
@@ -29,6 +37,18 @@ public class MainActivity extends Activity {
         ListView listView = (ListView) findViewById(R.id.list);
         listView.setOnItemClickListener(new ShoppingItemClickListener());
 
+        findViewById(R.id.add_item_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ContentValues contentValues = new ContentValues();
+                contentValues.put("value", "monkey");
+                Uri uri = Uri.parse("content://net.todd.shoppinglist");
+
+                new AsyncQueryHandler(getContentResolver()) {
+                }.startInsert(-1, null, uri, contentValues);
+            }
+        });
+
         getLoaderManager().restartLoader(0, null, loaderCallback);
     }
 
@@ -38,6 +58,7 @@ public class MainActivity extends Activity {
 
         ListView listView = (ListView) findViewById(R.id.list);
         listView.setOnItemClickListener(null);
+        findViewById(R.id.add_item_button).setOnClickListener(null);
 
         getLoaderManager().destroyLoader(0);
     }
