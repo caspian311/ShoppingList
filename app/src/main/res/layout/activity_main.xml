@@ -11,11 +11,14 @@
         android:layout_alignParentTop="true">
         <ListView android:id="@+id/list"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:divider="#CCCCCC"
+            android:dividerHeight="2px" />
         <TextView
             android:id="@+id/no_items_available"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textSize="24dp"
             android:text="@string/no_items_available"
             android:visibility="gone" />
 
