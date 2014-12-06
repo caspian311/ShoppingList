@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.net.Uri;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,14 @@ public class ListContentProvider extends ContentProvider {
     public ShoppingListCursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         count = 0;
 
-        List<ShoppingListItem> data = webService.getAll(new ShoppingListItemParser());
+        List<ShoppingListItem> data = new ArrayList<ShoppingListItem>();
+
+        try {
+            data.addAll(webService.getAll(new ShoppingListItemParser()));
+        } catch (Exception e) {
+            Log.e("shopping list", "Error occurred when getting all shopping items: " + e);
+        }
+
         for (ShoppingListItem item : data) {
             itemIdMap.put(++count, item.getRealId());
             item.setId(count);
@@ -43,7 +51,11 @@ public class ListContentProvider extends ContentProvider {
     @Override
     public Uri insert(Uri uri, ContentValues values) {
         Log.i("shopping list", "inserting content values: " + values);
-        webService.post(values);
+        try {
+            webService.post(values);
+        } catch (Exception e) {
+            Log.e("shopping list", "Error occurred when inserting item: " + e);
+        }
         return null;
     }
 
@@ -51,7 +63,11 @@ public class ListContentProvider extends ContentProvider {
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         String id = itemIdMap.get(Long.parseLong(selection));
         Log.i("shopping list", "deleting value: " + selection);
-        webService.delete(id);
+        try {
+            webService.delete(id);
+        } catch (Exception e) {
+            Log.e("shopping item", "Error occurred when deleting item: " + e);
+        }
         return 0;
     }
 
