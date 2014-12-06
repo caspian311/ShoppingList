@@ -3,5 +3,9 @@
 
     <string name="app_name">ShoppingList</string>
     <string name="add_item">Add Item</string>
+    <string name="delete_dialog_title">Delete item?</string>
+    <string name="delete_dialog_message">Are you sure you want to delete this item?</string>
+    <string name="delete_button_text">Delete?</string>
+    <string name="cancel_delete_button">Nevermind</string>
 
 </resources>

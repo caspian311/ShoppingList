@@ -18,12 +18,19 @@ public class ShoppingListCursor extends AbstractCursor {
 
     @Override
     public String[] getColumnNames() {
-        return new String[]{ "_id", "name" };
+        return new String[]{"_id", "name"};
     }
 
     @Override
     public String getString(int column) {
-        return data.get(mPos).getName();
+        switch (column) {
+            case 0:
+                return data.get(mPos).getRealId();
+            case 1:
+                return data.get(mPos).getName();
+            default:
+                return null;
+        }
     }
 
     @Override
@@ -38,7 +45,7 @@ public class ShoppingListCursor extends AbstractCursor {
 
     @Override
     public long getLong(int column) {
-        return 0;
+        return data.get(mPos).getId();
     }
 
     @Override

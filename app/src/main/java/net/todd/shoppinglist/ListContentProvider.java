@@ -5,9 +5,14 @@ import android.content.ContentValues;
 import android.net.Uri;
 import android.util.Log;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ListContentProvider extends ContentProvider {
+    private Map<Long, String> itemIdMap = new HashMap<Long, String>();
+    private long count;
+
     @Override
     public boolean onCreate() {
         return false;
@@ -15,8 +20,13 @@ public class ListContentProvider extends ContentProvider {
 
     @Override
     public ShoppingListCursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        count = 0;
         WebService webService = new WebService();
         List<ShoppingListItem> data = webService.getAll("http://10.0.3.2:3000/shoppingItems", new ShoppingListItemParser());
+        for(ShoppingListItem item : data) {
+            itemIdMap.put(count++, item.getRealId());
+            item.setId(count);
+        }
         return new ShoppingListCursor(data);
     }
 
@@ -34,6 +44,10 @@ public class ListContentProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
+        String pathSegment = uri.getLastPathSegment();
+        String id = itemIdMap.get(Long.parseLong(pathSegment));
+        Log.i("shopping list", "deleting value: " + id);
+        new WebService().delete("http://10.0.3.2:3000/shoppingItems" + "/" + id);
         return 0;
     }
 

@@ -8,6 +8,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -61,6 +62,15 @@ public class WebService<T> {
             request.setEntity(new UrlEncodedFormEntity(namedValuePairs));
             HttpResponse response = new DefaultHttpClient().execute(request);
 
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void delete(String url) {
+        try {
+            HttpDelete request = new HttpDelete(url);
+            HttpResponse response = new DefaultHttpClient().execute(request);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
