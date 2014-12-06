@@ -26,7 +26,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WebService<T> {
-    public List<T> getAll(String url, ItemParser<T> itemParser) {
+    private String url;
+
+    public WebService(String url) {
+        this.url = url;
+    }
+
+    public List<T> getAll(ItemParser<T> itemParser) {
         try {
             HttpRequestBase request = new HttpGet(url);
             HttpResponse response = new DefaultHttpClient().execute(request);
@@ -49,7 +55,7 @@ public class WebService<T> {
         }
     }
 
-    public void post(String url, ContentValues contentValues) {
+    public void post(ContentValues contentValues) {
         try {
             HttpPost request = new HttpPost(url);
 
@@ -67,9 +73,9 @@ public class WebService<T> {
         }
     }
 
-    public void delete(String url) {
+    public void delete(String id) {
         try {
-            HttpDelete request = new HttpDelete(url);
+            HttpDelete request = new HttpDelete(url + "/" + id);
             HttpResponse response = new DefaultHttpClient().execute(request);
         } catch (Exception e) {
             throw new RuntimeException(e);

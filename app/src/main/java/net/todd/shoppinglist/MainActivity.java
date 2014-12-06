@@ -21,6 +21,12 @@ import android.widget.TextView;
 public class MainActivity extends Activity {
     private LoaderCallback loaderCallback;
 
+    private Uri uri;
+
+    public MainActivity() {
+        this.uri = Uri.parse("content://net.todd.shoppinglist");
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,11 +57,6 @@ public class MainActivity extends Activity {
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        Uri uri = Uri.parse("content://net.todd.shoppinglist")
-                                                .buildUpon()
-                                                .appendPath("" + id)
-                                                .build();
-
                                         new AsyncQueryHandler(getContentResolver()) {
                                             @Override
                                             protected void onDeleteComplete(int token, Object cookie, int result) {
@@ -63,7 +64,7 @@ public class MainActivity extends Activity {
 
                                                 getLoaderManager().restartLoader(0, null, loaderCallback);
                                             }
-                                        }.startDelete(-1, null, uri, null, null);
+                                        }.startDelete(-1, null, uri, "" + id, null);
                                     }
                                 })
                         .setNegativeButton(R.string.cancel_delete_button, null)
@@ -78,7 +79,6 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 ContentValues contentValues = new ContentValues();
                 contentValues.put("value", "monkey");
-                Uri uri = Uri.parse("content://net.todd.shoppinglist");
 
                 new AsyncQueryHandler(getContentResolver()) {
                     @Override
