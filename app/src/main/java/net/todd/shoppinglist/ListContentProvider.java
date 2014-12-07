@@ -11,12 +11,15 @@ import java.util.List;
 import java.util.Map;
 
 public class ListContentProvider extends ContentProvider {
+//    private static final String SERVICE_URL = "http://10.0.3.2:3000/shoppingItems";
+    private static final String SERVICE_URL = "http://caspian311-shoppinglist.herokuapp.com/shoppingItems";
+
     private Map<Long, String> itemIdMap = new HashMap<Long, String>();
     private long count;
     private WebService webService;
 
     public ListContentProvider() {
-        webService = new WebService("http://10.0.3.2:3000/shoppingItems");
+        webService = new WebService(SERVICE_URL);
     }
 
     @Override

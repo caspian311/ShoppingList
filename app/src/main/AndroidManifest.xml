@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="net.todd.shoppinglist" >
+    package="net.todd.shoppinglist">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -21,7 +21,7 @@
 
         <activity
             android:name="net.todd.shoppinglist.NewItemActivity"
-            android:label="@string/app_name" />
+            android:label="@string/new_item_activity_label" />
 
         <provider
             android:name="net.todd.shoppinglist.ListContentProvider"
