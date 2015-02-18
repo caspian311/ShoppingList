@@ -39,19 +39,8 @@ public class CustomRobolectricRunner extends RobolectricTestRunner {
     }
 
     @Override
-    protected SdkConfig pickSdkVersion(
-            AndroidManifest appManifest, Config config) {
-        // current Robolectric supports not the latest android SDK version
-        // so we must downgrade to simulate the latest supported version.
+    protected SdkConfig pickSdkVersion(AndroidManifest appManifest, Config config) {
         config = overwriteConfig(config, "emulateSdk", "18");
         return super.pickSdkVersion(appManifest, config);
-    }
-
-    @Override
-    protected void configureShadows(SdkEnvironment sdkEnvironment, Config config) {
-        Properties properties = new Properties();
-        // to add more shadows use white space separation + " " +
-        properties.setProperty("shadows", ShadowSupportMenuInflater.class.getName());
-        super.configureShadows(sdkEnvironment, new Config.Implementation(config, Config.Implementation.fromProperties(properties)));
     }
 }

@@ -11,27 +11,19 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.UserDictionary;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.ResourceCursorAdapter;
 import android.widget.SimpleCursorAdapter;
-import android.widget.TextView;
 
 public class MainActivity extends Activity implements LoaderManager.LoaderCallbacks<Cursor> {
-    private static final int SHOPPING_LIST_LOADER = 1;
+    public static final int SHOPPING_LIST_LOADER = 1;
     private static final int NEW_ITEM_REQUEST = Activity.RESULT_FIRST_USER + 1;
 
-    private Uri uri;
+    private final Uri uri = Uri.parse("content://net.todd.shoppinglist");
     private SimpleCursorAdapter adapter;
-
-    public MainActivity() {
-        this.uri = Uri.parse("content://net.todd.shoppinglist");
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,13 +34,13 @@ public class MainActivity extends Activity implements LoaderManager.LoaderCallba
 
         ListView listView = (ListView) findViewById(R.id.list);
         listView.setAdapter(adapter);
-
-        getLoaderManager().initLoader(SHOPPING_LIST_LOADER, null, this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        getLoaderManager().initLoader(SHOPPING_LIST_LOADER, null, this);
 
         ListView listView = (ListView) findViewById(R.id.list);
         listView.setOnItemLongClickListener(new android.widget.AdapterView.OnItemLongClickListener() {
