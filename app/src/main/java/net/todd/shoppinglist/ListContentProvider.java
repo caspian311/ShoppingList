@@ -19,7 +19,11 @@ public class ListContentProvider extends ContentProvider {
     private WebService webService;
 
     public ListContentProvider() {
-        webService = new WebService(SERVICE_URL);
+        this(new WebService(SERVICE_URL, new ShoppingListItemParser()));
+    }
+
+    ListContentProvider(WebService webService) {
+        this.webService = webService;
     }
 
     @Override
@@ -34,7 +38,7 @@ public class ListContentProvider extends ContentProvider {
         List<ShoppingListItem> data = new ArrayList<ShoppingListItem>();
 
         try {
-            data.addAll(webService.getAll(new ShoppingListItemParser()));
+            data.addAll(webService.getAll());
         } catch (Exception e) {
             Log.e("shopping list", "Error occurred when getting all shopping items: " + e);
         }

@@ -21,13 +21,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WebService<T> {
+    private final ItemParser<T> itemParser;
     private String url;
 
-    public WebService(String url) {
+    public WebService(String url, ItemParser<T> itemParser) {
         this.url = url;
+        this.itemParser = itemParser;
     }
 
-    public List<T> getAll(ItemParser<T> itemParser) throws Exception {
+    public List<T> getAll() throws Exception {
         HttpRequestBase request = new HttpGet(url);
         HttpResponse response = new DefaultHttpClient().execute(request);
 
