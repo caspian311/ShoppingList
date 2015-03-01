@@ -28,6 +28,8 @@ public class MainActivity extends Activity {
     private CursorAdapter adapter;
     private TaskManager taskManager;
     private ListView listView;
+    private DeleteConfirmationDialog deleteConfirmationDialog;
+    private long itemToDelete;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +39,14 @@ public class MainActivity extends Activity {
         listView = (ListView) findViewById(R.id.list);
         adapter = createAdapter(this);
         listView.setAdapter(adapter);
+
+        deleteConfirmationDialog = new DeleteConfirmationDialog(this);
+        deleteConfirmationDialog.setPositiveButtonClickListener(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                taskManager.deleteTask(itemToDelete);
+            }
+        });
 
         taskManager = new TaskManager(this, getContentResolver(), getLoaderManager(), adapter);
     }
@@ -53,19 +63,8 @@ public class MainActivity extends Activity {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, final long id) {
                 Log.i("monkey", "item to delete: " + id);
-                new AlertDialog.Builder(MainActivity.this)
-                        .setTitle(R.string.delete_dialog_title)
-                        .setMessage(R.string.delete_dialog_message)
-                        .setPositiveButton(R.string.delete_button_text,
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        taskManager.deleteTask(id);
-                                    }
-                                })
-                        .setNegativeButton(R.string.cancel_delete_button, null)
-                        .create().show();
-
+                itemToDelete = id;
+                deleteConfirmationDialog.show();
                 return true;
             }
         });
