@@ -46,16 +46,20 @@ public class TaskManager extends AsyncQueryHandler {
 
     @Override
     protected void onInsertComplete(int token, Object cookie, Uri uri) {
+        kickOffLoader();
+    }
+
+    private void kickOffLoader() {
         loaderManager.restartLoader(MainActivity.SHOPPING_LIST_LOADER, null, cursorLoader);
     }
 
     public void loadTasks() {
-        loaderManager.restartLoader(MainActivity.SHOPPING_LIST_LOADER, null, cursorLoader);
+        kickOffLoader();
     }
 
     @Override
     protected void onDeleteComplete(int token, Object cookie, int result) {
-        loaderManager.restartLoader(MainActivity.SHOPPING_LIST_LOADER, null, cursorLoader);
+        kickOffLoader();
     }
 
     public void deleteTask(long id) {
